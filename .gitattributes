@@ -1,0 +1,39 @@
+# Auto-detect text files and normalise line endings to LF in the repository.
+# Each developer's working copy uses their OS native line endings automatically.
+* text=auto
+
+# Force specific file types
+*.py    text eol=lf
+*.md    text eol=lf
+*.json  text eol=lf
+*.csv   text eol=lf
+*.scad  text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.cfg   text eol=lf
+*.txt   text eol=lf
+*.bat   text eol=crlf
+
+# Binary files — never touch line endings
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pt    binary
+*.pth   binary
+*.npz   binary
+*.npy   binary
+*.exe   binary
+*.zip   binary
+*.stl   binary
+*.3mf   binary
+*.gcode binary
+*.csg   binary
+*.docx  binary
+*.xlsx  binary
+*.pdf   binary
