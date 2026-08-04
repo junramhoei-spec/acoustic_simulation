@@ -1,16 +1,71 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 
-# Large Datasets (>50MB) and Executables
-dataset/v2/*.npz
-dataset/spectrum_data/
+# Exclude all root level files except README.md and .gitignore
+*.scad
 *.exe
 *.zip
+*.csv
+*.npz
+*.pth
+*.spec
+*.txt
+*.lnk
+*.dxf
+*.svg
+*.html
+*.bat
+*.xlsx
+*.docx
+*.md
+*.resolved
+!README.md
 dist/
 build/
 backups/
+v1_backup/
+assets/
+core/
+parts/
+portable_app/
+stepper_test/
+tests/
+visualization/
+measured_plots/
+measured_plots_v3/
+measured_plots_v4/
+output_실측 물채움*/
+
+# Legacy root app scripts (v1)
+app.py
+dl_app.py
+dl_spectrum_app.py
+dl_spectrum_rnn_app.py
+inference_app.py
+inverse_app.py
+run_app.py
+build_exe.py
+convert_to_onnx.py
+dataset_generator.py
+generate_ml_dataset.py
+generate_spectrum_dataset.py
+inspect_dataset.py
+test_cone.py
+test_convergence.py
+verify_csv.py
+font_test.png
+tmm_convergence_test.png
+tmm_spectrum_comparison.png
+v4_combo_test.png
+waterfall_test.png
+
+# Exclude raw dataset chunks
+dataset/*
+!dataset/models_v2/
+!dataset/v2/
+dataset/v2/*.npz
 
 # Environments and OS generated
 .venv/
@@ -21,6 +76,6 @@ Thumbs.db
 .idea/
 .vscode/
 .gemini/
-
-# Office temp locks
-~$*.docx
+.claude/
+scratch/
+AGENTS.md
