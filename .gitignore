@@ -3,6 +3,12 @@ __pycache__/
 *.py[cod]
 *.class
 
+# Allow SCAD and Markdown files inside v2, V2, docs
+!v2/**/*.scad
+!V2/**/*.scad
+!docs/**/*.scad
+!docs/**/*.md
+
 # Exclude root level files except README.md and .gitignore
 /*.scad
 *.exe
@@ -19,7 +25,7 @@ __pycache__/
 *.bat
 *.xlsx
 *.docx
-*.md
+/*.md
 *.resolved
 !README.md
 /dist/
