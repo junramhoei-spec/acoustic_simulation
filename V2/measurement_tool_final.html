@@ -1,0 +1,4483 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎙️ Acoustic Measurement Tool</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   CSS — Dark Theme Measurement UI
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-canvas: #010409;
+  --border: #30363d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  --accent-blue: #58a6ff;
+  --accent-green: #3fb950;
+  --accent-red: #f85149;
+  --accent-orange: #d29922;
+  --accent-purple: #bc8cff;
+  --accent-cyan: #39d2c0;
+  --gradient-blue: linear-gradient(135deg, #1a73e8 0%, #58a6ff 100%);
+  --gradient-green: linear-gradient(135deg, #238636 0%, #3fb950 100%);
+  --gradient-red: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+  --gradient-purple: linear-gradient(135deg, #8957e5 0%, #bc8cff 100%);
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --radius: 8px;
+  --radius-sm: 4px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ─── Header ─────────────────────────────── */
+.header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-title .icon { font-size: 1.5rem; }
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.device-select {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  max-width: 250px;
+}
+
+/* ─── Tab Navigation ─────────────────────── */
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  padding: 0 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+.tab-btn.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+/* ─── Main Layout ────────────────────────── */
+.main-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - 100px);
+}
+.sidebar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+}
+.content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* ─── Sidebar Controls ───────────────────── */
+.control-section {
+  margin-bottom: 24px;
+}
+.control-section h3 {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.control-group {
+  margin-bottom: 12px;
+}
+.control-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.control-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent-blue);
+}
+.control-group input[type="number"],
+.control-group select {
+  width: 100%;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.85rem;
+}
+.range-value {
+  float: right;
+  font-size: 0.8rem;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* ─── Buttons ────────────────────────────── */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary { background: var(--gradient-blue); color: white; }
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-record { background: var(--gradient-red); color: white; }
+.btn-record:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 2px 12px rgba(248,81,73,0.4); }
+.btn-record.recording { animation: pulse-red 1.5s infinite; }
+.btn-success { background: var(--gradient-green); color: white; }
+.btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--accent-blue); }
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+.btn-block { width: 100%; justify-content: center; }
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,81,73,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(248,81,73,0); }
+}
+
+/* ─── Canvas Panels ──────────────────────── */
+.canvas-panel {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+  position: relative;
+}
+.canvas-panel .panel-header {
+  background: var(--bg-tertiary);
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.canvas-panel canvas {
+  display: block;
+  cursor: crosshair;
+}
+.canvas-cursor-info {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  background: rgba(0,0,0,0.7);
+  color: var(--accent-cyan);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-family: 'Consolas', monospace;
+  pointer-events: none;
+}
+
+/* ─── Formant Display ────────────────────── */
+.formant-display {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.formant-badge {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  text-align: center;
+  min-width: 100px;
+}
+.formant-badge .label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+.formant-badge .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: 'Consolas', monospace;
+}
+.formant-badge .bw {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.formant-badge:nth-child(1) .value { color: var(--accent-blue); }
+.formant-badge:nth-child(2) .value { color: var(--accent-green); }
+.formant-badge:nth-child(3) .value { color: var(--accent-orange); }
+.formant-badge:nth-child(4) .value { color: var(--accent-purple); }
+.formant-badge:nth-child(5) .value { color: var(--accent-cyan); }
+.formant-badge:nth-child(n+6) .value { color: var(--text-secondary); }
+
+/* ─── Wizard Steps ───────────────────────── */
+.wizard-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.wizard-step {
+  flex: 1;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.4;
+  transition: all 0.3s;
+}
+.wizard-step.active {
+  opacity: 1;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px var(--accent-blue);
+}
+.wizard-step.done {
+  opacity: 1;
+  border-color: var(--accent-green);
+  background: rgba(63,185,80,0.1);
+  cursor: pointer;
+}
+.wizard-step.done:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px var(--accent-blue);
+}
+.wizard-step .step-num {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.wizard-step.active .step-num { color: var(--accent-blue); }
+.wizard-step.done .step-num { color: var(--accent-green); }
+
+/* ─── Toggle Buttons ────────────────────── */
+.toggle-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.toggle-btn {
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.toggle-btn:hover { border-color: var(--text-secondary); }
+.toggle-btn.active {
+  border-color: var(--accent-blue);
+  background: rgba(88,166,255,0.15);
+  color: var(--accent-blue);
+}
+.toggle-btn.active.ref-color { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(57,210,192,0.15); }
+.toggle-btn.active.meas-color { border-color: var(--accent-orange); color: var(--accent-orange); background: rgba(210,153,34,0.15); }
+.toggle-btn.active.tf-color { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(88,166,255,0.15); }
+.wizard-instruction {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.wizard-instruction .icon { font-size: 2rem; margin-bottom: 8px; }
+.wizard-instruction p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+/* ─── Water Filling Session ──────────────── */
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.step-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.step-progress-fill {
+  height: 100%;
+  background: var(--gradient-blue);
+  transition: width 0.3s;
+  border-radius: 4px;
+}
+.step-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ─── Status Bar ─────────────────────────── */
+.status-bar {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 6px 24px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 24px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+.status-item { display: flex; align-items: center; gap: 6px; }
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+.status-dot.active { background: var(--accent-green); }
+.status-dot.recording { background: var(--accent-red); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* ─── Tab Content Visibility ─────────────── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ─── Misc ───────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.badge-green { background: rgba(63,185,80,0.2); color: var(--accent-green); }
+.badge-blue { background: rgba(88,166,255,0.2); color: var(--accent-blue); }
+.badge-red { background: rgba(248,81,73,0.2); color: var(--accent-red); }
+.hidden { display: none !important; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.text-center { text-align: center; }
+.flex-row { display: flex; gap: 8px; align-items: center; }
+.flex-row.end { justify-content: flex-end; }
+
+/* ─── Startup Overlay ─────────────────────── */
+#startupOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(1,4,9,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.startup-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 56px;
+  text-align: center;
+  max-width: 420px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.startup-card .icon { font-size: 3.5rem; margin-bottom: 16px; }
+.startup-card h2 { font-size: 1.3rem; margin-bottom: 12px; }
+.startup-card p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+.startup-card .btn { font-size: 1.05rem; padding: 14px 36px; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+
+<!-- Startup Overlay -->
+<div id="startupOverlay">
+  <div class="startup-card">
+    <div class="icon">🎙️</div>
+    <h2>Acoustic Measurement Tool</h2>
+    <p>마이크 접근 권한이 필요합니다.<br>아래 버튼을 눌러 마이크를 연결하세요.</p>
+    <button class="btn btn-primary" id="startupBtn">🎙️ 마이크 연결 및 시작</button>
+    <div id="startupError" style="color:var(--accent-red); font-size:0.85rem; margin-top:16px; display:none;"></div>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════════════════════════
+     HTML Structure
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- Header -->
+<div class="header">
+  <div class="header-title">
+    <span class="icon">🎙️</span>
+    <span>Acoustic Measurement Tool</span>
+  </div>
+  <div class="header-controls">
+    <label style="font-size:0.8rem; color:var(--text-secondary);">입력 장치:</label>
+    <select id="inputDeviceSelect" class="device-select"></select>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="0">🎤 녹음 / 분석</button>
+  <button class="tab-btn" data-tab="1">📊 스윕 전달함수</button>
+  <button class="tab-btn" data-tab="2">💧 이산 물채움</button>
+</div>
+
+<!-- Main -->
+<div class="main-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Common settings -->
+    <div class="control-section">
+      <h3>⚙️ FFT 설정</h3>
+      <div class="control-group">
+        <label>FFT 크기</label>
+        <select id="fftSizeSelect">
+          <option value="1024">1024</option>
+          <option value="2048" selected>2048</option>
+          <option value="4096">4096</option>
+          <option value="8192">8192</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>윈도우 함수</label>
+        <select id="windowSelect">
+          <option value="hanning" selected>Hanning</option>
+          <option value="hamming">Hamming</option>
+          <option value="blackman">Blackman</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>스펙트로그램 오버랩 <span class="range-value" id="overlapValue">75%</span></label>
+        <input type="range" id="overlapSlider" min="25" max="90" value="75" step="5">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="control-section">
+      <h3>🔎 포먼트 (LPC)</h3>
+      <div class="control-group">
+        <label>LPC 차수 <span class="range-value" id="lpcOrderValue">20</span></label>
+        <input type="range" id="lpcOrderSlider" min="8" max="100" value="20" step="2">
+      </div>
+      <div class="control-group">
+        <label>최대 포먼트 주파수 (Hz)</label>
+        <input type="number" id="maxFormantFreq" value="5500" step="500">
+      </div>
+      <div class="control-group">
+        <label>최대 대역폭 (Hz) <span class="range-value" id="maxBwValue">400</span></label>
+        <input type="range" id="maxBwSlider" min="100" max="1000" value="400" step="50">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Sweep settings (shown for tab 1, 2) -->
+    <div class="control-section" id="sweepSettings">
+      <h3>🔊 스윕 설정</h3>
+      <div class="control-group">
+        <label>시작 주파수 (Hz)</label>
+        <input type="number" id="sweepStartFreq" value="20" min="1">
+      </div>
+      <div class="control-group">
+        <label>끝 주파수 (Hz)</label>
+        <input type="number" id="sweepEndFreq" value="8000" min="100">
+      </div>
+      <div class="control-group">
+        <label>스윕 길이 (초) <span class="range-value" id="sweepDurValue">2.0</span></label>
+        <input type="range" id="sweepDuration" min="0.5" max="5" value="2" step="0.5">
+      </div>
+      <div class="control-group">
+        <label>볼륨 <span class="range-value" id="sweepVolValue">80%</span></label>
+        <input type="range" id="sweepVolume" min="0" max="100" value="80">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="control-section">
+      <h3>📥 내보내기</h3>
+      <button class="btn btn-secondary btn-sm btn-block" id="exportSessionBtn" disabled>📦 세션 JSON</button>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content">
+
+    <!-- ═══ Tab 0: Record / Analyze ═══ -->
+    <div class="tab-content active" id="tab0">
+      <div class="flex-row mb-16">
+        <button class="btn btn-record" id="recordBtn">⏺ 녹음 시작</button>
+        <button class="btn btn-success hidden" id="playBtn">▶ 재생</button>
+        <button class="btn btn-secondary" id="loadAudioBtn">📂 파일 열기</button>
+        <input type="file" id="audioFileInput" accept="audio/*,.wav,.mp3,.ogg" class="hidden">
+        <span id="recordingTimer" class="hidden" style="color:var(--accent-red); font-weight:700; font-family:Consolas,monospace; font-size:1.1rem; margin-left:8px;">● 00:00.0</span>
+      </div>
+
+      <!-- Real-time / Waveform -->
+      <div class="canvas-panel">
+        <div class="panel-header">
+          <span>📈 파형 (Waveform)</span>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <button class="btn btn-secondary btn-sm hidden" id="dlWavBtn" style="font-size:0.7rem; padding:2px 8px;">💾 WAV</button>
+            <span id="waveformInfo"></span>
+          </span>
+        </div>
+        <canvas id="waveformCanvas" height="130"></canvas>
+      </div>
+
+      <!-- Spectrogram (shown after recording) -->
+      <div class="canvas-panel hidden" id="spectrogramPanel">
+        <div class="panel-header">
+          <span>🌈 스펙트로그램 — 클릭하여 해당 시점 분석</span>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <button class="btn btn-secondary btn-sm" id="dlSpectrogramBtn" style="font-size:0.7rem; padding:2px 8px;">📥 CSV</button>
+            <span id="spectrogramInfo"></span>
+          </span>
+        </div>
+        <canvas id="spectrogramCanvas" height="250"></canvas>
+        <div class="canvas-cursor-info" id="spectrogramCursor"></div>
+      </div>
+
+      <!-- FFT Spectrum -->
+      <div class="canvas-panel">
+        <div class="panel-header">
+          <span>📊 FFT 스펙트럼</span>
+          <span style="display:flex; align-items:center; gap:6px;">
+            <button class="btn btn-secondary btn-sm hidden" id="dlFftBtn" style="font-size:0.7rem; padding:2px 8px;">📥 CSV</button>
+            <span id="spectrumInfo"></span>
+          </span>
+        </div>
+        <canvas id="spectrumCanvas" height="200"></canvas>
+        <div class="canvas-cursor-info" id="spectrumCursor"></div>
+      </div>
+
+      <!-- Formants -->
+      <div class="hidden" id="formantPanel">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="font-size:0.9rem; margin:0;">🎯 포먼트 추출 결과</h3>
+          <button class="btn btn-secondary btn-sm" id="dlFormantBtn" style="font-size:0.7rem; padding:2px 8px;">📥 CSV</button>
+        </div>
+        <div class="formant-display" id="formantDisplay"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab 1: Sweep Transfer Function ═══ -->
+    <div class="tab-content" id="tab1">
+      <div class="wizard-steps">
+        <div class="wizard-step active" id="tfStep0">
+          <div class="step-num">1</div>
+          <div>레퍼런스 녹음</div>
+        </div>
+        <div class="wizard-step" id="tfStep1">
+          <div class="step-num">2</div>
+          <div>측정 녹음</div>
+        </div>
+        <div class="wizard-step" id="tfStep2">
+          <div class="step-num">3</div>
+          <div>전달함수 분석</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Reference -->
+      <div id="tfWizard0">
+        <div class="wizard-instruction">
+          <div class="icon">🔊</div>
+          <p>스피커 앞에 <strong>컵 없이</strong> 마이크만 배치한 상태에서<br>
+          아래 버튼을 눌러 레퍼런스 녹음을 시작하세요.</p>
+          <div style="display:flex; align-items:center; gap:6px; justify-content:center; margin-bottom:8px;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">반복 촬영 횟수(중앙값 결합)</label>
+            <input type="number" id="tfRefRepeat" value="5" min="1" max="15" style="width:56px;">
+          </div>
+          <button class="btn btn-primary" id="tfRefRecordBtn">▶ 레퍼런스 녹음</button>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">또는 이미 녹음된 레퍼런스 WAV 불러오기(여러 개 선택 시 중앙값 결합):</p>
+            <button class="btn btn-secondary btn-sm" id="tfRefImportWavBtn" style="font-size:0.75rem;">📂 레퍼런스 WAV 불러오기</button>
+            <input type="file" id="tfRefImportWavInput" accept=".wav" multiple class="hidden">
+            <p style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">이 세션과 같은 스윕 설정(시작/끝 주파수·길이·음량)으로 녹음된 WAV여야 정확합니다.</p>
+          </div>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">또는 저장된 세션 번들 불러오기(레퍼런스+측정 한 쌍):</p>
+            <button class="btn btn-secondary btn-sm" id="tfImportBundleBtn" style="font-size:0.75rem;">📂 세션 번들 (.zip) 불러오기</button>
+            <input type="file" id="tfImportBundleInput" accept=".zip" class="hidden">
+            <div id="tfImportStatus" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;"></div>
+          </div>
+        </div>
+        <div class="canvas-panel hidden" id="tfRefPreview">
+          <div class="panel-header"><span>레퍼런스 녹음 미리보기</span></div>
+          <canvas id="tfRefWaveCanvas" height="120"></canvas>
+        </div>
+        <div class="flex-row end mt-8 hidden" id="tfRefActions">
+          <button class="btn btn-secondary btn-sm" id="tfRefWavBtn">💾 WAV</button>
+          <button class="btn btn-secondary btn-sm" id="tfRefRedoBtn">↻ 다시 녹음</button>
+          <button class="btn btn-success btn-sm" id="tfRefNextBtn">다음 →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Measurement -->
+      <div id="tfWizard1" class="hidden">
+        <div class="wizard-instruction">
+          <div class="icon">🥛</div>
+          <p>측정할 <strong>컵을 스피커 앞에 놓은 후</strong><br>
+          아래 버튼을 눌러 측정 녹음을 시작하세요.</p>
+          <div style="display:flex; align-items:center; gap:6px; justify-content:center; margin-bottom:8px;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">반복 촬영 횟수(중앙값 결합)</label>
+            <input type="number" id="tfMeasRepeat" value="3" min="1" max="15" style="width:56px;">
+          </div>
+          <button class="btn btn-primary" id="tfMeasRecordBtn">▶ 측정 녹음</button>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">또는 이미 녹음된 측정 WAV 불러오기(여러 개 선택 시 중앙값 결합):</p>
+            <button class="btn btn-secondary btn-sm" id="tfMeasImportWavBtn" style="font-size:0.75rem;">📂 측정 WAV 불러오기</button>
+            <input type="file" id="tfMeasImportWavInput" accept=".wav" multiple class="hidden">
+            <p style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">이 세션과 같은 스윕 설정(시작/끝 주파수·길이·음량)으로 녹음된 WAV여야 정확합니다.</p>
+          </div>
+        </div>
+        <div class="canvas-panel hidden" id="tfMeasPreview">
+          <div class="panel-header"><span>측정 녹음 미리보기</span></div>
+          <canvas id="tfMeasWaveCanvas" height="120"></canvas>
+        </div>
+        <div class="flex-row end mt-8 hidden" id="tfMeasActions">
+          <button class="btn btn-secondary btn-sm" id="tfMeasWavBtn">💾 WAV</button>
+          <button class="btn btn-secondary btn-sm" id="tfMeasRedoBtn">↻ 다시 녹음</button>
+          <button class="btn btn-success btn-sm" id="tfMeasNextBtn">전달함수 계산 →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div id="tfWizard2" class="hidden">
+        <div class="toggle-group">
+          <span style="font-size:0.8rem; color:var(--text-muted); align-self:center; margin-right:4px;">표시:</span>
+          <button class="toggle-btn ref-color active" id="tfToggleRef" data-key="ref">📡 레퍼런스</button>
+          <button class="toggle-btn meas-color active" id="tfToggleMeas" data-key="meas">🥛 측정</button>
+          <button class="toggle-btn tf-color active" id="tfToggleTF" data-key="tf">📊 전달함수</button>
+        </div>
+        <div class="canvas-panel">
+          <div class="panel-header">
+            <span>📊 주파수 응답 비교</span>
+            <span id="tfResultInfo"></span>
+          </div>
+          <canvas id="tfResultCanvas" height="300"></canvas>
+          <div class="canvas-cursor-info" id="tfResultCursor"></div>
+        </div>
+        <div class="canvas-panel">
+          <div class="panel-header"><span>🔔 임펄스 응답 h(t)</span></div>
+          <canvas id="tfImpulseCanvas" height="150"></canvas>
+        </div>
+        <div id="tfFormantPanel">
+          <h3 style="font-size:0.9rem; margin-bottom:8px;">🎯 전달함수 포먼트 (공명 주파수)</h3>
+          <div class="formant-display" id="tfFormantDisplay"></div>
+        </div>
+        <div class="flex-row end mt-16">
+          <button class="btn btn-secondary btn-sm" id="tfResetBtn">🔄 새 측정</button>
+          <button class="btn btn-secondary btn-sm" id="tfDlBundleBtn">📦 세션 번들 (.zip)</button>
+          <button class="btn btn-primary btn-sm" id="tfExportCsvBtn">📥 전달함수 CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Tab 2: Discrete Water Filling ═══ -->
+    <div class="tab-content" id="tab2">
+      <!-- Session setup -->
+      <div id="wfSetup">
+        <div class="wizard-instruction">
+          <div class="icon">💧</div>
+          <p>이산 물채움 측정 세션을 시작합니다.<br>
+          먼저 <strong>레퍼런스 녹음</strong>을 하고, 이후 물을 단계적으로 추가하며 측정합니다.</p>
+        </div>
+        <div style="max-width:400px; margin:0 auto;">
+          <div class="control-group">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="wfUniformMode" checked style="width:auto;">
+              균등 투입 (매 스텝 동일한 양)
+            </label>
+          </div>
+          <div id="wfUniformFields">
+            <div class="control-group">
+              <label>1회 투입량 (mL)</label>
+              <input type="number" id="wfStepVolume" value="10" min="1" max="100">
+            </div>
+            <div class="control-group">
+              <label>예상 총 스텝 수</label>
+              <input type="number" id="wfTotalSteps" value="20" min="2" max="100">
+            </div>
+          </div>
+          <div id="wfVariableFields" class="hidden">
+            <div class="control-group">
+              <label>스텝별 투입량 (mL, 쉼표로 구분)</label>
+              <input type="text" id="wfVolumeSchedule" placeholder="예: 10,30,40,20,50" style="width:100%;">
+              <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0;" id="wfVolumeScheduleInfo">
+                Step 0(빈 컵) 다음부터 각 스텝에서 <strong>추가로</strong> 붓는 양입니다. 입력한 개수만큼 스텝이 만들어집니다(빈 컵 스텝 제외).
+              </p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>레퍼런스 반복 촬영 횟수 (중앙값 결합)</label>
+            <input type="number" id="wfRefRepeat" value="5" min="1" max="15">
+          </div>
+          <div class="control-group">
+            <label>스텝별 반복 촬영 횟수 (중앙값 결합)</label>
+            <input type="number" id="wfStepRepeat" value="3" min="1" max="15">
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin:-8px 0 8px;">
+            스윕을 여러 번 쏘고 주파수별 중앙값을 취해 순간 글리치(찍힘)를 제거합니다. 1로 두면 기존과 동일하게 1회만 측정합니다.
+          </p>
+          <button class="btn btn-primary btn-block mt-16" id="wfStartBtn">🚀 세션 시작</button>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border-color);">
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:6px;">또는 저장된 세션 번들 불러오기:</p>
+            <button class="btn btn-secondary btn-sm" id="wfImportBundleBtn" style="font-size:0.75rem;">📂 세션 번들 (.zip) 불러오기</button>
+            <input type="file" id="wfImportBundleInput" accept=".zip" class="hidden">
+            <div id="wfImportStatus" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session in progress -->
+      <div id="wfSession" class="hidden">
+        <!-- Reference step -->
+        <div id="wfRefStep">
+          <div class="wizard-instruction">
+            <div class="icon">🔊</div>
+            <p><strong>Step: 레퍼런스</strong> — 컵 없이 마이크만 놓고 녹음하세요</p>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:4px;">
+              <button class="btn btn-primary" id="wfRefRecordBtn" style="min-width:120px;">▶ 레퍼런스 녹음</button>
+              <button class="btn btn-secondary" id="wfRefRedoBtn" disabled style="min-width:100px;">↻ 다시 녹음</button>
+              <button class="btn btn-success" id="wfRefNextBtn" disabled style="min-width:110px;">다음 스텝 →</button>
+              <button class="btn btn-primary" id="wfRefFinishBtn" style="min-width:110px;">📊 결과 보기</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Measurement steps -->
+        <div id="wfMeasStep" class="hidden">
+          <div class="step-progress">
+            <div class="step-progress-bar">
+              <div class="step-progress-fill" id="wfProgressFill" style="width:0%"></div>
+            </div>
+            <div class="step-info" id="wfStepInfo">Step 1/20</div>
+          </div>
+
+          <div class="wizard-instruction" id="wfMeasInstruction">
+            <div class="icon">🥛</div>
+            <p id="wfMeasText">빈 컵을 놓고 녹음하세요 (누적: 0 mL)</p>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:4px;">
+              <button class="btn btn-primary" id="wfMeasRecordBtn" style="min-width:120px;">▶ 이 스텝 녹음</button>
+              <button class="btn btn-secondary" id="wfMeasRedoBtn" disabled style="min-width:100px;">↻ 다시 녹음</button>
+              <button class="btn btn-success" id="wfMeasNextBtn" disabled style="min-width:110px;">다음 스텝 →</button>
+              <button class="btn btn-primary" id="wfFinishBtn" style="min-width:110px;">📊 결과 보기</button>
+            </div>
+          </div>
+
+          <!-- Current step result -->
+          <div class="canvas-panel hidden" id="wfStepPreview">
+            <div class="panel-header"><span id="wfStepPreviewTitle">전달함수</span></div>
+            <canvas id="wfStepCanvas" height="200"></canvas>
+          </div>
+          <div class="hidden" id="wfStepFormants">
+            <div class="formant-display" id="wfStepFormantDisplay"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session results -->
+      <div id="wfResults" class="hidden">
+        <h3 style="margin-bottom:16px;">📊 이산 물채움 측정 결과</h3>
+        <div class="canvas-panel">
+          <div class="panel-header"><span>수위별 전달함수 워터폴</span></div>
+          <canvas id="wfWaterfallCanvas" height="350"></canvas>
+        </div>
+        <div class="canvas-panel">
+          <div class="panel-header"><span>🌈 수위별 전달함수 스펙트로그램 + 포먼트 추적</span></div>
+          <canvas id="wfTrackingCanvas" height="350"></canvas>
+        </div>
+
+        <!-- Step browser -->
+        <div style="margin-top:16px; padding:12px; background:var(--bg-secondary); border-radius:8px; border:1px solid var(--border-color);">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">🔍 스텝 탐색:</span>
+            <div id="wfStepBrowserBtns" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
+          </div>
+          <div id="wfStepBrowserContent" class="hidden">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+              <span id="wfBrowseTitle" style="font-size:0.85rem; font-weight:600;"></span>
+              <button class="btn btn-secondary btn-sm" id="wfBrowseWavBtn" style="font-size:0.7rem; padding:2px 8px;">💾 WAV</button>
+              <button class="btn btn-secondary btn-sm" id="wfBrowseTfCsvBtn" style="font-size:0.7rem; padding:2px 8px;">📥 전달함수 CSV</button>
+              <button class="btn btn-secondary btn-sm" id="wfBrowseFormantCsvBtn" style="font-size:0.7rem; padding:2px 8px;">📥 포먼트 CSV</button>
+            </div>
+            <div class="canvas-panel" style="margin-bottom:8px;">
+              <div class="panel-header"><span>📈 파형</span></div>
+              <canvas id="wfBrowseWaveCanvas" height="100"></canvas>
+            </div>
+            <div class="canvas-panel" style="margin-bottom:8px;">
+              <div class="panel-header"><span>📊 전달함수</span></div>
+              <canvas id="wfBrowseTfCanvas" height="150"></canvas>
+            </div>
+            <div style="margin-bottom:4px;">
+              <span style="font-size:0.8rem; font-weight:600;">🎯 포먼트</span>
+              <div class="formant-display" id="wfBrowseFormantDisplay"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- A0 레퍼런스 선정 실험 — 스텝은 그대로 두고 레퍼런스만 바꿔가며 비교/내보내기 -->
+        <div style="margin-top:16px; padding:12px; background:var(--bg-secondary); border-radius:8px; border:1px solid var(--border-color);">
+          <div style="font-size:0.85rem; color:var(--text-muted); font-weight:600; margin-bottom:10px;">
+            🔬 A0 레퍼런스 교체 실험 — 이미 녹음한 스텝은 그대로 두고, 레퍼런스만 바꿔가며 비교·내보내기
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">조건 라벨(파일명에 사용, 예: 무_흡음유)</label>
+            <input type="text" id="wfA0Label" value="" placeholder="무_흡음유" style="width:160px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-color); border-radius:4px; padding:4px 8px; font-size:0.8rem;">
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+            <label style="font-size:0.8rem; color:var(--text-muted);">반복 촬영 횟수</label>
+            <input type="number" id="wfA0RefRepeat" value="5" min="1" max="15" style="width:56px;">
+            <button class="btn btn-primary btn-sm" id="wfA0RecordRefBtn">🎤 새 레퍼런스 녹음</button>
+            <button class="btn btn-secondary btn-sm" id="wfA0ImportRefBtn">📂 레퍼런스 WAV 불러오기</button>
+            <input type="file" id="wfA0ImportRefInput" accept=".wav" multiple class="hidden">
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 8px;">
+            WAV로 불러올 경우, <strong>이 세션과 같은 스윕 설정(시작/끝 주파수·길이·음량)</strong>으로 녹음된 파일이어야 정확합니다.
+            새로 녹음하면 현재 사이드바의 스윕 설정을 그대로 사용합니다.
+          </p>
+          <div id="wfA0Status" style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:8px;">
+            현재 레퍼런스: 세션 시작 시 녹음한 것 그대로 (아직 교체 안 함)
+          </div>
+          <div class="canvas-panel" style="margin-bottom:10px;">
+            <div class="panel-header"><span>📊 현재 레퍼런스 기준 비율 미리보기 (마지막 스텝)</span></div>
+            <canvas id="wfA0PreviewCanvas" height="180"></canvas>
+          </div>
+          <div class="flex-row" style="flex-wrap:wrap; gap:8px;">
+            <button class="btn btn-primary btn-sm" id="wfA0ExportRatioBtn">📥 이 레퍼런스로 비율 JSON (app.py용)</button>
+            <button class="btn btn-secondary btn-sm" id="wfA0ExportRawBtn">📥 개별 테이크 원본 스펙트럼 전체 (zip, 재현성 분석용)</button>
+          </div>
+        </div>
+
+        <div class="flex-row end mt-16">
+          <button class="btn btn-secondary btn-sm" id="wfNewSessionBtn">🔄 새 세션</button>
+          <button class="btn btn-secondary btn-sm" id="wfDlBundleBtn">📦 세션 번들 (.zip)</button>
+          <button class="btn btn-primary btn-sm" id="wfExportAllBtn">📥 전체 CSV</button>
+          <button class="btn btn-primary btn-sm" id="wfExportV2Btn">🐍 app.py용 JSON</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Status Bar -->
+<div class="status-bar">
+  <div class="status-item">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">대기 중</span>
+  </div>
+  <div class="status-item">🎤 <span id="statusSampleRate">--</span> Hz</div>
+  <div class="status-item">⏱ <span id="statusDuration">0.0</span>s</div>
+  <div class="status-item">📊 FFT: <span id="statusFFT">2048</span></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// 1. DSP Core — FFT, Window Functions, LPC, Deconvolution
+// ═══════════════════════════════════════════════════════════════════
+
+const DSP = (() => {
+
+  // ─── Cooley-Tukey radix-2 FFT ───────────────────────────
+  function fft(re, im) {
+    const N = re.length;
+    if (N <= 1) return;
+    // Bit-reversal permutation
+    for (let i = 1, j = 0; i < N; i++) {
+      let bit = N >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) {
+        [re[i], re[j]] = [re[j], re[i]];
+        [im[i], im[j]] = [im[j], im[i]];
+      }
+    }
+    // FFT butterfly
+    for (let len = 2; len <= N; len <<= 1) {
+      const half = len >> 1;
+      const angle = -2 * Math.PI / len;
+      const wRe = Math.cos(angle), wIm = Math.sin(angle);
+      for (let i = 0; i < N; i += len) {
+        let curRe = 1, curIm = 0;
+        for (let j = 0; j < half; j++) {
+          const a = i + j, b = a + half;
+          const tRe = curRe * re[b] - curIm * im[b];
+          const tIm = curRe * im[b] + curIm * re[b];
+          re[b] = re[a] - tRe;
+          im[b] = im[a] - tIm;
+          re[a] += tRe;
+          im[a] += tIm;
+          const newCurRe = curRe * wRe - curIm * wIm;
+          curIm = curRe * wIm + curIm * wRe;
+          curRe = newCurRe;
+        }
+      }
+    }
+  }
+
+  function ifft(re, im) {
+    const N = re.length;
+    for (let i = 0; i < N; i++) im[i] = -im[i];
+    fft(re, im);
+    for (let i = 0; i < N; i++) { re[i] /= N; im[i] = -im[i] / N; }
+  }
+
+  function nextPow2(n) {
+    let p = 1;
+    while (p < n) p <<= 1;
+    return p;
+  }
+
+  // ─── Window Functions ───────────────────────────────────
+  function windowFunc(type, N) {
+    const w = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const x = i / (N - 1);
+      switch (type) {
+        case 'hanning':  w[i] = 0.5 * (1 - Math.cos(2 * Math.PI * x)); break;
+        case 'hamming':  w[i] = 0.54 - 0.46 * Math.cos(2 * Math.PI * x); break;
+        case 'blackman': w[i] = 0.42 - 0.5 * Math.cos(2 * Math.PI * x) + 0.08 * Math.cos(4 * Math.PI * x); break;
+        default: w[i] = 1;
+      }
+    }
+    return w;
+  }
+
+  // ─── Power Spectrum (dB) ────────────────────────────────
+  function powerSpectrum(signal, fftSize, windowType) {
+    const N = fftSize || nextPow2(signal.length);
+    const win = windowFunc(windowType || 'hanning', Math.min(signal.length, N));
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    for (let i = 0; i < Math.min(signal.length, N); i++) re[i] = signal[i] * (i < win.length ? win[i] : 0);
+    fft(re, im);
+    const half = N >> 1;
+    const mag = new Float64Array(half);
+    for (let i = 0; i < half; i++) {
+      mag[i] = 20 * Math.log10(Math.sqrt(re[i] * re[i] + im[i] * im[i]) + 1e-12);
+    }
+    return mag;
+  }
+
+  // ─── Complex FFT (returns re + im arrays) ───────────────
+  function complexFFT(signal, fftSize) {
+    const N = fftSize || nextPow2(signal.length);
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    for (let i = 0; i < Math.min(signal.length, N); i++) re[i] = signal[i];
+    fft(re, im);
+    return { re, im, N };
+  }
+
+  // ─── STFT → Spectrogram ─────────────────────────────────
+  function stft(signal, fftSize, hopSize, windowType) {
+    const win = windowFunc(windowType || 'hanning', fftSize);
+    const half = fftSize >> 1;
+    const frames = [];
+    for (let start = 0; start + fftSize <= signal.length; start += hopSize) {
+      const re = new Float64Array(fftSize);
+      const im = new Float64Array(fftSize);
+      for (let i = 0; i < fftSize; i++) re[i] = signal[start + i] * win[i];
+      fft(re, im);
+      const mag = new Float64Array(half);
+      for (let i = 0; i < half; i++) {
+        mag[i] = 20 * Math.log10(Math.sqrt(re[i] * re[i] + im[i] * im[i]) + 1e-12);
+      }
+      frames.push(mag);
+    }
+    return frames;
+  }
+
+  // ─── Log Sweep Generation ──────────────────────────────
+  function generateLogSweep(f1, f2, duration, sampleRate, volume) {
+    const N = Math.round(duration * sampleRate);
+    const padSamples = Math.round(0.3 * sampleRate);
+    const total = N + 2 * padSamples;
+    const signal = new Float32Array(total);
+    const T = duration;
+    const lnRatio = Math.log(f2 / f1);
+    const fadeLen = Math.round(0.02 * sampleRate);
+    const vol = (volume || 0.8);
+
+    for (let i = 0; i < N; i++) {
+      const t = i / sampleRate;
+      const phase = 2 * Math.PI * f1 * T / lnRatio * (Math.exp(t / T * lnRatio) - 1);
+      let amp = vol;
+      if (i < fadeLen) amp *= i / fadeLen;
+      if (i > N - fadeLen) amp *= (N - i) / fadeLen;
+      signal[padSamples + i] = amp * Math.sin(phase);
+    }
+    return signal;
+  }
+
+  // ─── Deconvolution (Wiener) ─────────────────────────────
+  function deconvolve(recording, sweep, sampleRate) {
+    const N = nextPow2(Math.max(recording.length, sweep.length) * 2);
+    const yRe = new Float64Array(N), yIm = new Float64Array(N);
+    const xRe = new Float64Array(N), xIm = new Float64Array(N);
+    for (let i = 0; i < recording.length; i++) yRe[i] = recording[i];
+    for (let i = 0; i < sweep.length; i++) xRe[i] = sweep[i];
+    fft(yRe, yIm);
+    fft(xRe, xIm);
+
+    // Find max |X|^2 for Wiener regularization
+    let maxXpow = 0;
+    for (let i = 0; i < N; i++) {
+      const p = xRe[i] * xRe[i] + xIm[i] * xIm[i];
+      if (p > maxXpow) maxXpow = p;
+    }
+    const eps = maxXpow * 1e-6;
+
+    // H = Y·X* / (|X|² + eps)
+    const hRe = new Float64Array(N), hIm = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      const xp = xRe[i] * xRe[i] + xIm[i] * xIm[i] + eps;
+      hRe[i] = (yRe[i] * xRe[i] + yIm[i] * xIm[i]) / xp;
+      hIm[i] = (yIm[i] * xRe[i] - yRe[i] * xIm[i]) / xp;
+    }
+
+    // Impulse response
+    const irRe = new Float64Array(N), irIm = new Float64Array(N);
+    irRe.set(hRe); irIm.set(hIm);
+    ifft(irRe, irIm);
+
+    // Magnitude response (dB)
+    const half = N >> 1;
+    const freqs = new Float64Array(half);
+    const magDb = new Float64Array(half);
+    const phase = new Float64Array(half);
+    for (let i = 0; i < half; i++) {
+      freqs[i] = i * sampleRate / N;
+      magDb[i] = 20 * Math.log10(Math.sqrt(hRe[i] * hRe[i] + hIm[i] * hIm[i]) + 1e-12);
+      phase[i] = Math.atan2(hIm[i], hRe[i]);
+    }
+
+    return {
+      impulseResponse: irRe.slice(0, recording.length),
+      freqs, magDb, phase,
+      hRe: hRe.slice(0, half),
+      hIm: hIm.slice(0, half),
+      N, sampleRate
+    };
+  }
+
+  // ─── Downsample (FFT-based anti-alias + decimate) ──────
+  function downsample(signal, fromRate, targetRate) {
+    const decimFactor = Math.max(1, Math.round(fromRate / targetRate));
+    if (decimFactor <= 1) return { signal, sampleRate: fromRate };
+
+    const actualRate = fromRate / decimFactor;
+    const N = nextPow2(signal.length);
+    const re = new Float64Array(N);
+    const im = new Float64Array(N);
+    for (let i = 0; i < signal.length; i++) re[i] = signal[i];
+    fft(re, im);
+
+    // Zero out frequencies above new Nyquist
+    const cutoffBin = Math.floor(N / decimFactor / 2);
+    for (let i = cutoffBin; i <= N - cutoffBin; i++) {
+      re[i] = 0;
+      im[i] = 0;
+    }
+
+    ifft(re, im);
+
+    // Decimate
+    const outLen = Math.floor(signal.length / decimFactor);
+    const out = new Float64Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      out[i] = re[i * decimFactor];
+    }
+
+    return { signal: out, sampleRate: actualRate };
+  }
+
+  // ─── LPC (Levinson-Durbin) ─────────────────────────────
+  function computeLPC(signal, order) {
+    const N = signal.length;
+    // Pre-emphasis
+    const pre = new Float64Array(N);
+    pre[0] = signal[0];
+    for (let i = 1; i < N; i++) pre[i] = signal[i] - 0.97 * signal[i - 1];
+
+    // Autocorrelation
+    const R = new Float64Array(order + 1);
+    for (let k = 0; k <= order; k++) {
+      let sum = 0;
+      for (let i = 0; i < N - k; i++) sum += pre[i] * pre[i + k];
+      R[k] = sum;
+    }
+    if (R[0] < 1e-10) return { coeffs: new Float64Array(order + 1), gain: 0 };
+
+    // Levinson-Durbin
+    const a = new Float64Array(order + 1);
+    const aTemp = new Float64Array(order + 1);
+    let E = R[0];
+    a[0] = 1.0;
+
+    for (let m = 1; m <= order; m++) {
+      let lambda = 0;
+      for (let j = 0; j < m; j++) lambda += a[j] * R[m - j];
+      lambda = -lambda / E;
+
+      aTemp.set(a);
+      for (let j = 1; j < m; j++) a[j] = aTemp[j] + lambda * aTemp[m - j];
+      a[m] = lambda;
+      E *= (1 - lambda * lambda);
+      if (E < 1e-20) break;
+    }
+
+    return { coeffs: a, gain: Math.sqrt(Math.max(E, 0)) };
+  }
+
+  // ─── LPC Spectral Envelope ─────────────────────────────
+  function lpcSpectrum(coeffs, gain, fftSize) {
+    const half = fftSize >> 1;
+    const mag = new Float64Array(half);
+    const order = coeffs.length - 1;
+
+    for (let i = 0; i < half; i++) {
+      const w = Math.PI * i / half;
+      let re = 0, im = 0;
+      for (let k = 0; k <= order; k++) {
+        re += coeffs[k] * Math.cos(k * w);
+        im -= coeffs[k] * Math.sin(k * w);
+      }
+      const denom = Math.sqrt(re * re + im * im);
+      mag[i] = denom > 1e-12 ? 20 * Math.log10(gain / denom) : -120;
+    }
+    return mag;
+  }
+
+  // ─── Extract Formants from LPC Envelope ────────────────
+  function extractFormants(signal, sampleRate, order, maxFreq, maxBandwidth, fftSize) {
+    const N = signal.length;
+
+    // Apply Hamming window BEFORE LPC analysis (critical for accuracy!)
+    const windowed = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      windowed[i] = signal[i] * (0.54 - 0.46 * Math.cos(2 * Math.PI * i / (N - 1)));
+    }
+
+    // ── Downsample to 2×maxFreq before LPC (Praat method) ──
+    // Focuses all LPC poles on the formant region instead of
+    // wasting them on high frequencies (e.g. 5–24 kHz at 48 kHz SR)
+    const targetRate = maxFreq * 2;
+    let lpcSignal = windowed;
+    let lpcRate = sampleRate;
+    if (targetRate < sampleRate * 0.9) {
+      const ds = downsample(windowed, sampleRate, targetRate);
+      lpcSignal = ds.signal;
+      lpcRate = ds.sampleRate;
+    }
+
+    // Guard: need at least order×2 samples for LPC
+    if (lpcSignal.length < order * 2) {
+      return { formants: [], envelope: new Float64Array((fftSize || 2048) >> 1), coeffs: new Float64Array(order + 1), gain: 0 };
+    }
+
+    const { coeffs, gain } = computeLPC(lpcSignal, order);
+
+    // Use high-resolution FFT for LPC spectrum (sharper peaks)
+    const specRes = Math.max(fftSize || 2048, 4096);
+    const envelope = lpcSpectrum(coeffs, gain, specRes);
+
+    // The envelope covers 0 → lpcRate/2.
+    // Map it to a display envelope covering 0 → sampleRate/2.
+    const targetHalf = (fftSize || 2048) >> 1;
+    const displayEnvelope = new Float64Array(targetHalf);
+    const lpcNyquist = lpcRate / 2;
+    const origNyquist = sampleRate / 2;
+
+    for (let i = 0; i < targetHalf; i++) {
+      const freq = (i / targetHalf) * origNyquist;
+      if (freq <= lpcNyquist) {
+        const srcIdx = (freq / lpcNyquist) * (envelope.length - 1);
+        const idx0 = Math.floor(srcIdx);
+        const frac = srcIdx - idx0;
+        const idx1 = Math.min(idx0 + 1, envelope.length - 1);
+        displayEnvelope[i] = envelope[idx0] * (1 - frac) + envelope[idx1] * frac;
+      } else {
+        displayEnvelope[i] = -120; // No LPC data above downsampled Nyquist
+      }
+    }
+
+    // Peak picking on high-resolution envelope (using downsampled rate)
+    const half = envelope.length;
+    const freqPerBin = lpcRate / 2 / half;
+    const maxBin = Math.min(half - 1, Math.round(maxFreq / freqPerBin));
+
+    const formants = [];
+    for (let i = 2; i < maxBin - 1; i++) {
+      if (envelope[i] > envelope[i - 1] && envelope[i] > envelope[i + 1] &&
+          envelope[i] > envelope[i - 2] && envelope[i] > envelope[i + 2]) {
+        // Parabolic interpolation for precise frequency
+        const y0 = envelope[i - 1], y1 = envelope[i], y2 = envelope[i + 1];
+        const delta = 0.5 * (y0 - y2) / (y0 - 2 * y1 + y2 + 1e-12);
+        const freq = (i + delta) * freqPerBin;
+
+        // Estimate bandwidth: -3dB width
+        const peakLevel = y1;
+        const threshold = peakLevel - 3;
+        let bwLow = i, bwHigh = i;
+        while (bwLow > 0 && envelope[bwLow] > threshold) bwLow--;
+        while (bwHigh < half - 1 && envelope[bwHigh] > threshold) bwHigh++;
+        const bw = (bwHigh - bwLow) * freqPerBin;
+
+        if (freq > 50 && bw < maxBandwidth && bw > 5) {
+          formants.push({ freq: Math.round(freq), bw: Math.round(bw), mag: y1 });
+        }
+      }
+    }
+
+    formants.sort((a, b) => a.freq - b.freq);
+    return { formants, envelope: displayEnvelope, coeffs, gain };
+  }
+
+  // ─── Peak Picking on raw FFT ───────────────────────────
+  function findPeaks(magDb, sampleRate, fftSize, minProminence) {
+    const half = magDb.length;
+    const freqPerBin = sampleRate / (fftSize || half * 2);
+    const prom = minProminence || 3;
+    const peaks = [];
+    for (let i = 2; i < half - 2; i++) {
+      if (magDb[i] > magDb[i-1] && magDb[i] > magDb[i+1] &&
+          magDb[i] > magDb[i-2] && magDb[i] > magDb[i+2]) {
+        // Check prominence
+        const leftMin = Math.min(...magDb.slice(Math.max(0, i - 30), i));
+        const rightMin = Math.min(...magDb.slice(i + 1, Math.min(half, i + 31)));
+        const prominence = magDb[i] - Math.max(leftMin, rightMin);
+        if (prominence >= prom) {
+          const y0 = magDb[i-1], y1 = magDb[i], y2 = magDb[i+1];
+          const delta = 0.5 * (y0 - y2) / (y0 - 2*y1 + y2 + 1e-12);
+          peaks.push({ freq: (i + delta) * freqPerBin, mag: y1, prominence });
+        }
+      }
+    }
+    peaks.sort((a, b) => b.prominence - a.prominence);
+    return peaks;
+  }
+
+  return {
+    fft, ifft, nextPow2, windowFunc, powerSpectrum, complexFFT,
+    stft, generateLogSweep, deconvolve, downsample,
+    computeLPC, lpcSpectrum, extractFormants, findPeaks
+  };
+})();
+
+
+// ═══════════════════════════════════════════════════════════════════
+// 2. Audio Engine — Recording, Playback, Device Management
+// ═══════════════════════════════════════════════════════════════════
+
+class AudioEngine {
+  constructor() {
+    this.audioCtx = null;
+    this.micStream = null;
+    this.sampleRate = 48000;
+    this.isRecording = false;
+    this.recordedBuffer = null;
+    this.analyserNode = null;
+    this.sourceNode = null;
+    this._scriptNode = null;
+    this._pcmChunks = [];
+    this._pcmSampleCount = 0;
+    this.recordStartTime = 0;
+    this.permissionGranted = false;
+  }
+
+  async requestPermission() {
+    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+      sampleRate: this.sampleRate
+    });
+    if (this.audioCtx.state === 'suspended') await this.audioCtx.resume();
+    this.sampleRate = this.audioCtx.sampleRate;
+
+    this.micStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+
+    await this.enumerateDevices();
+    this.permissionGranted = true;
+  }
+
+  async enumerateDevices() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const inputs = devices.filter(d => d.kind === 'audioinput');
+    const select = document.getElementById('inputDeviceSelect');
+    select.innerHTML = '';
+    if (inputs.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '기본 마이크';
+      select.appendChild(opt);
+    } else {
+      inputs.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `마이크 ${select.options.length + 1}`;
+        select.appendChild(opt);
+      });
+    }
+  }
+
+  startRecording() {
+    if (!this.audioCtx || !this.micStream) {
+      throw new Error('마이크가 연결되지 않았습니다.');
+    }
+    if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+
+    // MediaStreamSource from mic
+    this.sourceNode = this.audioCtx.createMediaStreamSource(this.micStream);
+
+    // AnalyserNode for real-time visualization
+    this.analyserNode = this.audioCtx.createAnalyser();
+    this.analyserNode.fftSize = parseInt(document.getElementById('fftSizeSelect').value) * 2;
+    this.analyserNode.smoothingTimeConstant = 0.3;
+    this.sourceNode.connect(this.analyserNode);
+
+    // Direct PCM capture via ScriptProcessorNode (no codec, no decode needed)
+    this._pcmChunks = [];
+    this._pcmSampleCount = 0;
+    const bufSize = 4096;
+    this._scriptNode = this.audioCtx.createScriptProcessor(bufSize, 1, 1);
+    this._scriptNode.onaudioprocess = (e) => {
+      if (!this.isRecording) return;
+      const input = e.inputBuffer.getChannelData(0);
+      this._pcmChunks.push(new Float32Array(input));
+      this._pcmSampleCount += input.length;
+    };
+    this.sourceNode.connect(this._scriptNode);
+    // ScriptProcessorNode requires connection to destination to fire events
+    this._scriptNode.connect(this.audioCtx.destination);
+
+    this.isRecording = true;
+    this.recordStartTime = performance.now();
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+
+    // Disconnect nodes
+    if (this._scriptNode) {
+      this._scriptNode.disconnect();
+      this._scriptNode.onaudioprocess = null;
+      this._scriptNode = null;
+    }
+    if (this.sourceNode) { this.sourceNode.disconnect(); this.sourceNode = null; }
+    if (this.analyserNode) { this.analyserNode.disconnect(); this.analyserNode = null; }
+
+    // Merge PCM chunks into a single Float32Array
+    return new Promise((resolve) => {
+      if (!this._pcmChunks || this._pcmChunks.length === 0) {
+        resolve(this.recordedBuffer);
+        return;
+      }
+      const total = this._pcmSampleCount;
+      const merged = new Float32Array(total);
+      let offset = 0;
+      for (const chunk of this._pcmChunks) {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+      }
+      this.recordedBuffer = merged;
+      this.sampleRate = this.audioCtx.sampleRate;
+      this._pcmChunks = null;
+      this._pcmSampleCount = 0;
+      resolve(merged);
+    });
+  }
+
+  async playSweep(sweepSignal) {
+    if (this.audioCtx.state === 'suspended') await this.audioCtx.resume();
+    const buffer = this.audioCtx.createBuffer(1, sweepSignal.length, this.sampleRate);
+    buffer.getChannelData(0).set(sweepSignal);
+    const source = this.audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(this.audioCtx.destination);
+    return new Promise(resolve => {
+      source.onended = resolve;
+      source.start();
+    });
+  }
+
+  async playAndRecord(sweepSignal) {
+    this.startRecording();
+    await new Promise(r => setTimeout(r, 200));
+    await this.playSweep(sweepSignal);
+    await new Promise(r => setTimeout(r, 500));
+    return await this.stopRecording();
+  }
+
+  getElapsedTime() {
+    if (!this.isRecording) return 0;
+    return (performance.now() - this.recordStartTime) / 1000;
+  }
+
+  async decodeAudioFile(file) {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      this.sampleRate = this.audioCtx.sampleRate;
+    }
+    const arrayBuf = await file.arrayBuffer();
+    const audioBuf = await this.audioCtx.decodeAudioData(arrayBuf);
+    this.sampleRate = audioBuf.sampleRate;
+    this.recordedBuffer = audioBuf.getChannelData(0);
+    return this.recordedBuffer;
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// 3. Visualization — Canvas Renderers
+// ═══════════════════════════════════════════════════════════════════
+
+const Viz = (() => {
+
+  const COLORS = {
+    waveform: '#58a6ff',
+    grid: 'rgba(48,54,61,0.8)',
+    gridText: '#484f58',
+    fftLine: '#58a6ff',
+    lpcLine: '#f0883e',
+    peak: '#f85149',
+    formantColors: ['#58a6ff', '#3fb950', '#d29922', '#bc8cff', '#39d2c0', '#f0883e', '#f778ba'],
+    spectrogramBg: '#010409'
+  };
+
+  // Canvas dimension cache to prevent flickering from repeated resizing
+  let _canvasCache = new WeakMap();
+
+  function initCanvas(canvas) {
+    const parent = canvas.parentElement;
+    const w = Math.floor(parent.clientWidth);
+    const h = parseInt(canvas.getAttribute('height')) || 200;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const state = { ctx, w, h, cachedW: w };
+    _canvasCache.set(canvas, state);
+    return state;
+  }
+
+  function getCanvas(canvas) {
+    const cached = _canvasCache.get(canvas);
+    if (cached) {
+      const currentW = Math.floor(canvas.parentElement.clientWidth);
+      if (currentW === cached.cachedW && currentW > 0) {
+        // Just clear the transform to a clean state (no compounding)
+        const dpr = window.devicePixelRatio || 1;
+        cached.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return cached;
+      }
+    }
+    return initCanvas(canvas);
+  }
+
+  function invalidateCanvasCache() {
+    // Called on window resize — clears all cached dimensions
+    _canvasCache = new WeakMap();
+  }
+
+  // ─── Draw Waveform ──────────────────────────────────────
+  function drawWaveform(canvas, data, opts = {}) {
+    const { ctx, w, h } = getCanvas(canvas);
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+
+    // Grid
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 0.5;
+    const mid = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(0, mid); ctx.lineTo(w, mid);
+    ctx.stroke();
+
+    if (!data || data.length === 0) return;
+
+    ctx.strokeStyle = opts.color || COLORS.waveform;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+
+    const isFloat = data instanceof Float32Array || data instanceof Float64Array;
+    const step = data.length / w;
+
+    if (step > 4) {
+      // Min/max envelope for long waveforms — much better visual
+      for (let px = 0; px < w; px++) {
+        const startIdx = Math.floor(px * step);
+        const endIdx = Math.min(data.length, Math.floor((px + 1) * step));
+        let minVal = Infinity, maxVal = -Infinity;
+        for (let i = startIdx; i < endIdx; i++) {
+          const v = isFloat ? data[i] : (data[i] - 128) / 128;
+          if (v < minVal) minVal = v;
+          if (v > maxVal) maxVal = v;
+        }
+        const yMin = isFinite(minVal) ? mid - minVal * mid * 0.9 : mid;
+        const yMax = isFinite(maxVal) ? mid - maxVal * mid * 0.9 : mid;
+        if (px === 0) { ctx.moveTo(px, yMax); }
+        ctx.lineTo(px, yMax);
+        // Draw return path for min values at end
+      }
+      // Return path with min values for filled envelope
+      for (let px = w - 1; px >= 0; px--) {
+        const startIdx = Math.floor(px * step);
+        const endIdx = Math.min(data.length, Math.floor((px + 1) * step));
+        let minVal = Infinity;
+        for (let i = startIdx; i < endIdx; i++) {
+          const v = isFloat ? data[i] : (data[i] - 128) / 128;
+          if (v < minVal) minVal = v;
+        }
+        ctx.lineTo(px, mid - minVal * mid * 0.9);
+      }
+      ctx.closePath();
+      ctx.fillStyle = (opts.color || COLORS.waveform) + '40'; // semi-transparent fill
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      // Direct line for short data (real-time)
+      for (let px = 0; px < w; px++) {
+        const idx = Math.floor(px * step);
+        const val = isFloat ? data[idx] : (data[idx] - 128) / 128;
+        const y = isFinite(val) ? mid - val * mid * 0.9 : mid;
+        if (px === 0) ctx.moveTo(px, y);
+        else ctx.lineTo(px, y);
+      }
+      ctx.stroke();
+    }
+
+    // Click / analysis marker (red dashed)
+    if (opts.marker !== undefined && opts.marker !== null) {
+      const mx = opts.marker * w;
+      ctx.strokeStyle = '#f85149';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(mx, 0); ctx.lineTo(mx, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Playback position marker (green solid)
+    if (opts.playbackPos !== undefined && opts.playbackPos !== null) {
+      const px = opts.playbackPos * w;
+      ctx.strokeStyle = '#3fb950';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(px, 0); ctx.lineTo(px, h);
+      ctx.stroke();
+    }
+
+    // Selection highlight (blue region)
+    if (opts.selection) {
+      const [s, e] = opts.selection;
+      const sx = Math.min(s, e) * w, ex = Math.max(s, e) * w;
+      ctx.fillStyle = 'rgba(88,166,255,0.15)';
+      ctx.fillRect(sx, 0, ex - sx, h);
+      ctx.strokeStyle = 'rgba(88,166,255,0.7)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sx, 0); ctx.lineTo(sx, h);
+      ctx.moveTo(ex, 0); ctx.lineTo(ex, h);
+      ctx.stroke();
+    }
+  }
+
+  // ─── Draw FFT Spectrum ──────────────────────────────────
+  function drawSpectrum(canvas, magDb, sampleRate, fftSize, opts = {}) {
+    const { ctx, w, h } = getCanvas(canvas);
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+
+    if (!magDb || magDb.length === 0) return;
+
+    const maxFreq = opts.maxFreq || sampleRate / 2;
+    const maxBin = Math.min(magDb.length, Math.round(maxFreq / (sampleRate / fftSize)));
+
+    // Auto-range: find the actual data range for y-axis
+    let minDb, maxDb;
+    if (opts.autoRange) {
+      let dataMax = -Infinity;
+      for (let i = 1; i < maxBin; i++) {
+        if (isFinite(magDb[i]) && magDb[i] > dataMax) dataMax = magDb[i];
+      }
+      // GUARD: if all values are -Infinity (no signal), use fixed range
+      if (!isFinite(dataMax)) {
+        maxDb = 0;
+        minDb = -100;
+      } else {
+        maxDb = Math.ceil(dataMax / 10) * 10 + 10;
+        minDb = maxDb - 80;
+      }
+    } else {
+      minDb = opts.minDb !== undefined ? opts.minDb : -80;
+      maxDb = opts.maxDb !== undefined ? opts.maxDb : 0;
+    }
+    // Safety: ensure valid range
+    if (!isFinite(minDb)) minDb = -100;
+    if (!isFinite(maxDb)) maxDb = 0;
+    if (maxDb <= minDb) maxDb = minDb + 80;
+
+    const margin = { top: 10, bottom: 30, left: 50, right: 10 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+
+    // Grid
+    ctx.strokeStyle = COLORS.grid;
+    ctx.fillStyle = COLORS.gridText;
+    ctx.font = '10px Consolas, monospace';
+    ctx.lineWidth = 0.5;
+
+    // Frequency axis
+    const freqSteps = [100, 200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000];
+    for (const f of freqSteps) {
+      if (f > maxFreq) break;
+      const x = margin.left + (f / maxFreq) * plotW;
+      ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, h - margin.bottom); ctx.stroke();
+      ctx.fillText(f >= 1000 ? `${f/1000}k` : f, x - 10, h - margin.bottom + 14);
+    }
+
+    // dB axis
+    for (let db = minDb; db <= maxDb; db += 20) {
+      const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+      ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(w - margin.right, y); ctx.stroke();
+      ctx.fillText(`${db}`, margin.left - 35, y + 4);
+    }
+
+    // Spectrum line
+    ctx.strokeStyle = COLORS.fftLine;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < maxBin; i++) {
+      const x = margin.left + (i / maxBin) * plotW;
+      const db = isFinite(magDb[i]) ? Math.max(minDb, Math.min(maxDb, magDb[i])) : minDb;
+      const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // LPC envelope overlay
+    if (opts.lpcEnvelope) {
+      const lpc = opts.lpcEnvelope;
+      const lpcMaxBin = Math.min(lpc.length, maxBin);
+      ctx.strokeStyle = COLORS.lpcLine;
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      for (let i = 0; i < lpcMaxBin; i++) {
+        const x = margin.left + (i / maxBin) * plotW;
+        const db = isFinite(lpc[i]) ? Math.max(minDb, Math.min(maxDb, lpc[i])) : minDb;
+        const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Formant markers
+    if (opts.formants) {
+      opts.formants.forEach((f, idx) => {
+        const x = margin.left + (f.freq / maxFreq) * plotW;
+        const db = Math.max(minDb, Math.min(maxDb, f.mag));
+        const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+        ctx.fillStyle = COLORS.formantColors[idx % COLORS.formantColors.length];
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.font = 'bold 11px Consolas';
+        ctx.fillText(`F${idx + 1}`, x - 6, y - 10);
+      });
+    }
+
+    // Peak markers
+    if (opts.peaks) {
+      ctx.fillStyle = COLORS.peak;
+      opts.peaks.slice(0, 10).forEach(p => {
+        const x = margin.left + (p.freq / maxFreq) * plotW;
+        const db = Math.max(minDb, Math.min(maxDb, p.mag));
+        const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(x, y - 6); ctx.lineTo(x - 4, y - 12); ctx.lineTo(x + 4, y - 12);
+        ctx.closePath(); ctx.fill();
+      });
+    }
+
+    // Axis labels
+    ctx.fillStyle = COLORS.gridText;
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Hz', w - margin.right - 15, h - margin.bottom + 14);
+    ctx.save();
+    ctx.translate(12, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('dB', 0, 0);
+    ctx.restore();
+  }
+
+  // ─── Draw Spectrogram ───────────────────────────────────
+  function drawSpectrogram(canvas, frames, sampleRate, fftSize, opts = {}) {
+    const { ctx, w, h } = getCanvas(canvas);
+    if (!frames || frames.length === 0) {
+      ctx.fillStyle = '#010409'; ctx.fillRect(0, 0, w, h);
+      return;
+    }
+
+    const maxFreq = opts.maxFreq || 8000;
+    const half = frames[0].length;
+    const maxBin = Math.min(half, Math.round(maxFreq / (sampleRate / (fftSize || half * 2))));
+    const minDb = opts.minDb || -80;
+    const maxDb = opts.maxDb || 0;
+    const numFrames = frames.length;
+
+    // Create ImageData — use actual pixel dimensions
+    const dpr = window.devicePixelRatio || 1;
+    const pixW = Math.round(w * dpr);
+    const pixH = Math.round(h * dpr);
+    const imgData = ctx.createImageData(pixW, pixH);
+    const idata = imgData.data;
+
+    for (let px = 0; px < pixW; px++) {
+      const frameIdx = Math.floor(px / pixW * numFrames);
+      const frame = frames[Math.min(frameIdx, numFrames - 1)];
+      for (let py = 0; py < pixH; py++) {
+        const binIdx = Math.floor((1 - py / pixH) * maxBin);
+        const db = frame[Math.min(binIdx, frame.length - 1)];
+        const norm = Math.max(0, Math.min(1, (db - minDb) / (maxDb - minDb)));
+
+        // Viridis-like colormap
+        let r, g, b;
+        if (norm < 0.25) {
+          const t = norm / 0.25;
+          r = 68 + t * (33 - 68); g = 1 + t * (144 - 1); b = 84 + t * (140 - 84);
+        } else if (norm < 0.5) {
+          const t = (norm - 0.25) / 0.25;
+          r = 33 + t * (53 - 33); g = 144 + t * (183 - 144); b = 140 + t * (121 - 140);
+        } else if (norm < 0.75) {
+          const t = (norm - 0.5) / 0.25;
+          r = 53 + t * (187 - 53); g = 183 + t * (207 - 183); b = 121 + t * (48 - 121);
+        } else {
+          const t = (norm - 0.75) / 0.25;
+          r = 187 + t * (253 - 187); g = 207 + t * (231 - 207); b = 48 + t * (37 - 48);
+        }
+
+        const idx = (py * pixW + px) * 4;
+        idata[idx] = r; idata[idx+1] = g; idata[idx+2] = b; idata[idx+3] = 255;
+      }
+    }
+    // Reset transform for putImageData (it uses pixel coordinates)
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.putImageData(imgData, 0, 0);
+    ctx.restore();
+
+    // Axis labels (lightweight)
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '10px Consolas';
+    const freqLabels = [500, 1000, 2000, 3000, 4000, 5000];
+    for (const f of freqLabels) {
+      if (f > maxFreq) break;
+      const y = h * (1 - f / maxFreq);
+      ctx.fillText(`${f >= 1000 ? f/1000+'k' : f}`, 4, y + 4);
+    }
+
+    // Click marker
+    if (opts.marker !== undefined) {
+      const mx = opts.marker * w;
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(mx, 0); ctx.lineTo(mx, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Colorbar on the right
+    const cbW = 18, cbPad = 6;
+    const cbX = w - cbW - cbPad;
+    const cbTop = 6, cbH = h - 12;
+    for (let py = 0; py < cbH; py++) {
+      const norm = 1 - py / cbH;
+      let r, g, b;
+      if (norm < 0.25) {
+        const t = norm / 0.25;
+        r = 68 + t * (33 - 68); g = 1 + t * (144 - 1); b = 84 + t * (140 - 84);
+      } else if (norm < 0.5) {
+        const t = (norm - 0.25) / 0.25;
+        r = 33 + t * (53 - 33); g = 144 + t * (183 - 144); b = 140 + t * (121 - 140);
+      } else if (norm < 0.75) {
+        const t = (norm - 0.5) / 0.25;
+        r = 53 + t * (187 - 53); g = 183 + t * (207 - 183); b = 121 + t * (48 - 121);
+      } else {
+        const t = (norm - 0.75) / 0.25;
+        r = 187 + t * (253 - 187); g = 207 + t * (231 - 207); b = 48 + t * (37 - 48);
+      }
+      ctx.fillStyle = `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+      ctx.fillRect(cbX, cbTop + py, cbW, 1);
+    }
+    // Colorbar border
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(cbX, cbTop, cbW, cbH);
+    // Colorbar labels
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '9px Consolas';
+    ctx.textAlign = 'right';
+    const cbLabelX = cbX - 3;
+    const dbRange = maxDb - minDb;
+    for (let i = 0; i <= 4; i++) {
+      const dbVal = maxDb - (i / 4) * dbRange;
+      const yPos = cbTop + (i / 4) * cbH;
+      ctx.fillText(`${Math.round(dbVal)}`, cbLabelX, yPos + 3);
+    }
+    ctx.textAlign = 'start'; // reset
+
+    // ─── Formant Tracking Overlay (Praat-style) ────────────
+    if (opts.formantTracks) {
+      const tracks = opts.formantTracks; // Array of arrays: tracks[frameIdx] = [{freq, ...}, ...]
+      const maxFormants = 5;
+      const colors = ['#ff4444', '#ff6644', '#ff8844', '#ffaa44', '#ffcc44'];
+
+      // Draw connecting lines first
+      for (let fi = 0; fi < maxFormants; fi++) {
+        ctx.strokeStyle = colors[fi] || '#ff4444';
+        ctx.lineWidth = 1.2;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        let started = false;
+        for (let t = 0; t < tracks.length; t++) {
+          if (!tracks[t] || fi >= tracks[t].length) continue;
+          const freq = tracks[t][fi].freq;
+          if (freq <= 0 || freq > maxFreq) continue;
+          const x = (t / tracks.length) * w;
+          const y = h * (1 - freq / maxFreq);
+          if (!started) { ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+      }
+
+      // Draw dots
+      for (let t = 0; t < tracks.length; t++) {
+        if (!tracks[t]) continue;
+        const x = (t / tracks.length) * w;
+        for (let fi = 0; fi < Math.min(tracks[t].length, maxFormants); fi++) {
+          const freq = tracks[t][fi].freq;
+          if (freq <= 0 || freq > maxFreq) continue;
+          const y = h * (1 - freq / maxFreq);
+          // White outline
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          // Colored center
+          ctx.fillStyle = colors[fi] || '#ff4444';
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  // ─── Draw Transfer Function ─────────────────────────────
+  function drawTransferFunction(canvas, result, opts = {}) {
+    if (!result) return;
+    const maxFreq = opts.maxFreq || 8000;
+    const maxBin = Math.round(maxFreq / result.sampleRate * result.N);
+    const slicedDb = result.magDb.slice(0, maxBin);
+    drawSpectrum(canvas, slicedDb, result.sampleRate, result.N, {
+      maxFreq,
+      minDb: opts.minDb || -40,
+      maxDb: opts.maxDb || 40,
+      formants: opts.formants,
+      lpcEnvelope: opts.lpcEnvelope,
+      peaks: opts.peaks
+    });
+  }
+
+  // ─── Draw Impulse Response ──────────────────────────────
+  function drawImpulseResponse(canvas, ir) {
+    if (!ir) return;
+    // Find the peak and show a window around it
+    let maxVal = 0, maxIdx = 0;
+    for (let i = 0; i < ir.length; i++) {
+      if (Math.abs(ir[i]) > maxVal) { maxVal = Math.abs(ir[i]); maxIdx = i; }
+    }
+    const windowStart = Math.max(0, maxIdx - 200);
+    const windowEnd = Math.min(ir.length, maxIdx + 2000);
+    const slice = ir.slice(windowStart, windowEnd);
+    drawWaveform(canvas, slice, { color: '#3fb950' });
+  }
+
+  // ─── Draw Waterfall (multiple transfer functions) ───────
+  function drawWaterfall(canvas, results, labels, opts = {}) {
+    const { ctx, w, h } = getCanvas(canvas);
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+    if (!results || results.length === 0) return;
+
+    const maxFreq = opts.maxFreq || 8000;
+    const margin = { top: 20, bottom: 30, left: 50, right: 20 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+    const N = results.length;
+    const offset = plotH / N * 0.6;
+
+    for (let i = 0; i < N; i++) {
+      const r = results[i];
+      if (!r) continue;
+      const maxBin = Math.round(maxFreq / r.sampleRate * r.N);
+      const baseY = margin.top + (i / N) * plotH;
+      const alpha = 0.3 + 0.7 * (i / N);
+
+      // Fill
+      ctx.fillStyle = `rgba(88,166,255,${alpha * 0.1})`;
+      ctx.beginPath();
+      ctx.moveTo(margin.left, baseY);
+      for (let j = 0; j < maxBin; j++) {
+        const x = margin.left + (j / maxBin) * plotW;
+        const db = Math.max(-60, Math.min(40, r.magDb[j]));
+        const y = baseY - ((db + 60) / 100) * offset;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(margin.left + plotW, baseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Line
+      ctx.strokeStyle = `rgba(88,166,255,${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let j = 0; j < maxBin; j++) {
+        const x = margin.left + (j / maxBin) * plotW;
+        const db = Math.max(-60, Math.min(40, r.magDb[j]));
+        const y = baseY - ((db + 60) / 100) * offset;
+        if (j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Label
+      if (labels && labels[i]) {
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '10px sans-serif';
+        ctx.fillText(labels[i], margin.left - 45, baseY + 4);
+      }
+    }
+
+    // X axis
+    ctx.fillStyle = COLORS.gridText;
+    ctx.font = '10px Consolas';
+    [500, 1000, 2000, 3000, 4000, 5000].forEach(f => {
+      if (f > maxFreq) return;
+      const x = margin.left + (f / maxFreq) * plotW;
+      ctx.fillText(f >= 1000 ? f/1000+'k' : f, x - 8, h - margin.bottom + 14);
+    });
+  }
+
+  // ─── Draw Formant Tracking ──────────────────────────────
+  function drawFormantTracking(canvas, allFormants, labels, opts = {}) {
+    const { ctx, w, h } = getCanvas(canvas);
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+    if (!allFormants || allFormants.length === 0) return;
+
+    const maxFreq = opts.maxFreq || 6000;
+    const margin = { top: 20, bottom: 30, left: 50, right: 20 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+    const N = allFormants.length;
+
+    // Grid
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 0.5;
+    [500, 1000, 2000, 3000, 4000, 5000].forEach(f => {
+      if (f > maxFreq) return;
+      const y = margin.top + (1 - f / maxFreq) * plotH;
+      ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(w - margin.right, y); ctx.stroke();
+      ctx.fillStyle = COLORS.gridText;
+      ctx.font = '10px Consolas';
+      ctx.fillText(f >= 1000 ? f/1000+'k' : f, margin.left - 35, y + 4);
+    });
+
+    // Find max formant count
+    const maxFormants = Math.min(7, Math.max(...allFormants.map(f => f.length)));
+
+    // Draw each formant track
+    for (let fi = 0; fi < maxFormants; fi++) {
+      ctx.strokeStyle = COLORS.formantColors[fi % COLORS.formantColors.length];
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i < N; i++) {
+        if (fi < allFormants[i].length) {
+          const x = margin.left + (i / (N - 1)) * plotW;
+          const y = margin.top + (1 - allFormants[i][fi].freq / maxFreq) * plotH;
+          if (!started) { ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+          // Dot
+          ctx.fillRect(x - 3, y - 3, 6, 6);
+        }
+      }
+      ctx.stroke();
+
+      // Label
+      if (started) {
+        const lastIdx = allFormants.length - 1;
+        if (fi < allFormants[lastIdx].length) {
+          const x = margin.left + plotW + 4;
+          const y = margin.top + (1 - allFormants[lastIdx][fi].freq / maxFreq) * plotH;
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillText(`F${fi + 1}`, x, y + 4);
+        }
+      }
+    }
+
+    // X axis labels
+    ctx.fillStyle = COLORS.gridText;
+    ctx.font = '10px sans-serif';
+    if (labels) {
+      for (let i = 0; i < N; i += Math.max(1, Math.floor(N / 10))) {
+        const x = margin.left + (i / (N - 1)) * plotW;
+        ctx.fillText(labels[i], x - 10, h - margin.bottom + 14);
+      }
+    }
+  }
+
+  // ─── Formant Display Badges ─────────────────────────────
+  function showFormants(containerId, formants) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    formants.slice(0, 8).forEach((f, i) => {
+      const badge = document.createElement('div');
+      badge.className = 'formant-badge';
+      badge.innerHTML = `
+        <div class="label">F${i + 1}</div>
+        <div class="value">${f.freq} Hz</div>
+        <div class="bw">BW: ${f.bw} Hz</div>
+      `;
+      container.appendChild(badge);
+    });
+  }
+
+  return {
+    initCanvas, getCanvas, invalidateCache: invalidateCanvasCache,
+    drawWaveform, drawSpectrum, drawSpectrogram,
+    drawTransferFunction, drawImpulseResponse,
+    drawWaterfall, drawFormantTracking, showFormants, COLORS
+  };
+})();
+
+
+// ═══════════════════════════════════════════════════════════════════
+// 4. Session Manager — Data Storage & Export
+// ═══════════════════════════════════════════════════════════════════
+
+// ─── 다중 테이크 결합 — 스윕마다 각자 디컨볼브 후 주파수별 "중앙값" ──────
+// 스윕 1회는 각 주파수를 단 한 순간만 지나가므로, 그 순간에 낀 교란(글리치)이
+// 만회 없이 그대로 스펙트럼에 박힌다. 이를 여러 번 반복 측정해 줄이는 방법:
+//   1) 테이크마다 각각 독립적으로 스윕 디컨볼브 → 그 테이크만의 크기(dB) 스펙트럼.
+//   2) 주파수 빈마다 N개 테이크의 dB 값 중 "중앙값"을 채택.
+// 왜 원신호(raw recording)를 먼저 시간평균하지 않는가: 테이크마다 녹음 시작
+// 대기시간의 수 ms 지터가 있는데, 이건 각 테이크의 위상(딜레이)만 바꿀 뿐 크기(dB)에는
+// 영향이 없다(순수 지연은 |H(f)·e^{-i2πfτ}| = |H(f)|). 그런데 원신호를 시간축에서
+// 먼저 평균해버리면 그 위상차가 실제로 간섭을 일으켜 7kHz 부근에서 서로 상쇄될 수
+// 있다. 반면 "각자 디컨볼브 후 dB만 결합"하면 위상차 문제 자체가 생기지 않고,
+// 중앙값이라 절반 미만의 테이크에 낀 글리치도 완전히 제거된다(평균보다 강건).
+function medianOf(arr) {
+  const s = arr.slice().sort((a, b) => a - b);
+  const n = s.length;
+  const mid = n >> 1;
+  return n % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+function interpMagAt(freqs, values, f) {
+  const df = freqs[1] - freqs[0];
+  const idx = f / df;
+  const i0 = Math.floor(idx);
+  if (i0 < 0) return values[0];
+  if (i0 >= values.length - 1) return values[values.length - 1];
+  const t = idx - i0;
+  return values[i0] * (1 - t) + values[i0 + 1] * t;
+}
+
+// results: DSP.deconvolve()가 테이크마다 반환한 결과 배열 → 중앙값 결합 1개로.
+function combineDeconvResults(results) {
+  if (results.length === 1) return results[0];
+  const base = results[0];
+  const freqs = base.freqs;
+  const magDb = new Float64Array(freqs.length);
+  const phase = new Float64Array(freqs.length);
+  for (let i = 0; i < freqs.length; i++) {
+    const f = freqs[i];
+    const vals = results.map(r => interpMagAt(r.freqs, r.magDb, f));
+    magDb[i] = medianOf(vals);
+    phase[i] = base.phase[i];   // 위상은 결합 대상 아님(크기만 중앙값) — 대표(첫 테이크) 값 사용
+  }
+  return {
+    impulseResponse: base.impulseResponse,   // 포먼트 추출용(대표 테이크)
+    freqs, magDb, phase,
+    hRe: base.hRe, hIm: base.hIm,
+    N: base.N, sampleRate: base.sampleRate,
+    nTakes: results.length
+  };
+}
+
+class SessionManager {
+  constructor() {
+    this.reference = null;   // { sweep, recordings, recording, sampleRate, combined }
+    this.steps = [];         // [{ volume_mL, recordings, recording, deconvResult, formants }]
+    this.config = {};
+  }
+
+  // recordings: 단일 Float32Array 또는 배열(여러 테이크). 여러 개면 결합(중앙값) 저장.
+  setReference(sweep, recordings, sampleRate) {
+    const takes = Array.isArray(recordings) ? recordings : [recordings];
+    const results = takes.map(rec => DSP.deconvolve(rec, sweep, sampleRate));
+    const combined = combineDeconvResults(results);
+    this.reference = { sweep, recordings: takes, recording: takes[0], sampleRate, combined };
+  }
+
+  addStep(volume_mL, recordings) {
+    if (!this.reference) throw new Error('레퍼런스가 없습니다');
+    const takes = Array.isArray(recordings) ? recordings : [recordings];
+    const results = takes.map(rec => DSP.deconvolve(rec, this.reference.sweep, this.reference.sampleRate));
+    const deconvResult = combineDeconvResults(results);
+    const fftSize = parseInt(document.getElementById('fftSizeSelect').value);
+    const order = parseInt(document.getElementById('lpcOrderSlider').value);
+    const maxFreq = parseFloat(document.getElementById('maxFormantFreq').value);
+    const maxBw = parseFloat(document.getElementById('maxBwSlider').value);
+
+    // Extract formants from transfer function magnitude
+    // Use the impulse response for LPC analysis
+    const ir = deconvResult.impulseResponse;
+    // Find the main peak and extract a window around it
+    let maxVal = 0, maxIdx = 0;
+    for (let i = 0; i < ir.length; i++) {
+      if (Math.abs(ir[i]) > maxVal) { maxVal = Math.abs(ir[i]); maxIdx = i; }
+    }
+    const winStart = Math.max(0, maxIdx);
+    const winEnd = Math.min(ir.length, maxIdx + fftSize);
+    const irWindow = ir.slice(winStart, winEnd);
+
+    const formantResult = DSP.extractFormants(
+      irWindow, this.reference.sampleRate, order, maxFreq, maxBw, fftSize
+    );
+
+    const step = { volume_mL, recordings: takes, recording: takes[0], deconvResult, formants: formantResult.formants };
+    this.steps.push(step);
+    return step;
+  }
+
+  exportTransferFunctionCSV(result, refResult, measResult) {
+    let header = 'freq_Hz';
+    if (refResult) header += ',ref_dB';
+    if (measResult) header += ',meas_dB';
+    header += ',tf_dB,tf_phase_rad';
+    let csv = header + '\n';
+    const maxBin = Math.round(8000 / result.sampleRate * result.N);
+    for (let i = 0; i < maxBin; i++) {
+      let row = `${result.freqs[i].toFixed(1)}`;
+      if (refResult) row += `,${(refResult.magDb[i] || 0).toFixed(4)}`;
+      if (measResult) row += `,${(measResult.magDb[i] || 0).toFixed(4)}`;
+      row += `,${result.magDb[i].toFixed(4)},${result.phase[i].toFixed(6)}`;
+      csv += row + '\n';
+    }
+    return csv;
+  }
+
+  exportFormantTrackingCSV() {
+    const maxF = Math.max(...this.steps.map(s => s.formants.length));
+    let header = 'step,volume_mL';
+    for (let i = 0; i < maxF; i++) header += `,F${i+1}_Hz,F${i+1}_BW`;
+    let csv = header + '\n';
+    this.steps.forEach((s, idx) => {
+      let row = `${idx},${s.volume_mL}`;
+      for (let i = 0; i < maxF; i++) {
+        if (i < s.formants.length) {
+          row += `,${s.formants[i].freq},${s.formants[i].bw}`;
+        } else {
+          row += ',,';
+        }
+      }
+      csv += row + '\n';
+    });
+    return csv;
+  }
+
+  exportWAV(buffer, sampleRate) {
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const byteRate = sampleRate * numChannels * bitsPerSample / 8;
+    const blockAlign = numChannels * bitsPerSample / 8;
+    const dataSize = buffer.length * blockAlign;
+    const headerSize = 44;
+    const arrayBuf = new ArrayBuffer(headerSize + dataSize);
+    const view = new DataView(arrayBuf);
+
+    const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeStr(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    let offset = 44;
+    for (let i = 0; i < buffer.length; i++) {
+      const s = Math.max(-1, Math.min(1, buffer[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      offset += 2;
+    }
+    return new Blob([arrayBuf], { type: 'audio/wav' });
+  }
+
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  downloadCSV(csvString, filename) {
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvString], { type: 'text/csv;charset=utf-8;' });
+    this.downloadBlob(blob, filename);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+// 5. Application Controller
+// ═══════════════════════════════════════════════════════════════════
+
+const App = (() => {
+  let audio = new AudioEngine();
+  let session = new SessionManager();
+  let currentTab = 0;
+  let animFrameId = null;
+  let spectrogramFrames = null;
+  let spectrogramClickPos = null;
+  // Current analysis state (for exports)
+  let currentMagDb = null;
+  let currentFormants = null;
+  let currentFftSize = null;
+  // Waveform drag selection state
+  let selectionStart = null;
+  let selectionEnd = null;
+  let isDragging = false;
+  let dragStartX = 0;
+  // Playback animation state
+  let playbackAnimId = null;
+  let playbackStartTime = 0;
+  let playbackOffset = 0; // start offset in seconds
+  let playbackDuration = 0; // duration in seconds
+
+  // ─── Init ───────────────────────────────────────────────
+  async function init() {
+    setupEventListeners();
+    setupSliderListeners();
+    window.addEventListener('resize', handleResize);
+
+    // Startup overlay: request mic permission on click
+    document.getElementById('startupBtn').addEventListener('click', async () => {
+      const errEl = document.getElementById('startupError');
+      try {
+        errEl.style.display = 'none';
+        document.getElementById('startupBtn').textContent = '연결 중...';
+        document.getElementById('startupBtn').disabled = true;
+        await audio.requestPermission();
+        document.getElementById('statusSampleRate').textContent = audio.sampleRate;
+        document.getElementById('startupOverlay').style.display = 'none';
+        setStatus('준비 완료', 'active');
+      } catch (e) {
+        console.error('Permission error:', e);
+        errEl.textContent = '마이크 연결 실패: ' + e.message;
+        errEl.style.display = 'block';
+        document.getElementById('startupBtn').textContent = '🎙️ 다시 시도';
+        document.getElementById('startupBtn').disabled = false;
+      }
+    });
+  }
+
+  function handleResize() {
+    // Invalidate canvas size cache on window resize
+    Viz.invalidateCache();
+    // Redraw current view if we have data
+    if (audio.recordedBuffer && currentTab === 0 && !audio.isRecording) {
+      drawRecordedState();
+    }
+  }
+
+  // ─── Tab Switching ──────────────────────────────────────
+  function switchTab(idx) {
+    currentTab = idx;
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+    document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === idx));
+    updateExportButtons();
+  }
+
+  function updateExportButtons() {
+    const sessionBtn = document.getElementById('exportSessionBtn');
+
+    try {
+      if (currentTab === 0) {
+        sessionBtn.disabled = !audio.recordedBuffer;
+      } else if (currentTab === 1) {
+        sessionBtn.disabled = !tfResult;
+      } else if (currentTab === 2) {
+        sessionBtn.disabled = !(session.steps && session.steps.length > 0);
+      }
+    } catch (e) {
+      // Variables not yet initialized
+    }
+  }
+
+  // ─── Slider Listeners ──────────────────────────────────
+  function setupSliderListeners() {
+    const sliders = [
+      ['overlapSlider', 'overlapValue', v => v + '%'],
+      ['lpcOrderSlider', 'lpcOrderValue', v => v],
+      ['maxBwSlider', 'maxBwValue', v => v],
+      ['sweepDuration', 'sweepDurValue', v => parseFloat(v).toFixed(1)],
+      ['sweepVolume', 'sweepVolValue', v => v + '%'],
+    ];
+    sliders.forEach(([sliderId, valueId, fmt]) => {
+      const slider = document.getElementById(sliderId);
+      const display = document.getElementById(valueId);
+      if (slider && display) {
+        slider.addEventListener('input', () => display.textContent = fmt(slider.value));
+      }
+    });
+
+    // Auto-redraw when analysis parameters change
+    const analysisControls = [
+      'fftSizeSelect', 'windowSelect', 'overlapSlider',
+      'lpcOrderSlider', 'maxFormantFreq', 'maxBwSlider'
+    ];
+    analysisControls.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => {
+          if (audio.recordedBuffer && !audio.isRecording) drawRecordedState();
+        });
+        // For sliders: debounced redraw on input (while dragging)
+        if (el.type === 'range') {
+          let debounceTimer = null;
+          el.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+              if (audio.recordedBuffer && !audio.isRecording) drawRecordedState();
+            }, 200);
+          });
+        }
+      }
+    });
+  }
+
+  // ─── Event Listeners ───────────────────────────────────
+  function setupEventListeners() {
+    // Tab buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(parseInt(btn.dataset.tab)));
+    });
+
+    // ═══ Tab 0: Record/Analyze ═══
+    document.getElementById('recordBtn').addEventListener('click', toggleRecording);
+    document.getElementById('playBtn').addEventListener('click', playRecording);
+    document.getElementById('loadAudioBtn').addEventListener('click', () => document.getElementById('audioFileInput').click());
+    document.getElementById('audioFileInput').addEventListener('change', loadAudioFile);
+
+    // Spectrogram click
+    document.getElementById('spectrogramCanvas').addEventListener('click', onSpectrogramClick);
+    document.getElementById('spectrogramCanvas').addEventListener('mousemove', onSpectrogramHover);
+
+    // Waveform mouse interaction (drag selection + click analysis)
+    const wfCanvas = document.getElementById('waveformCanvas');
+    wfCanvas.addEventListener('mousedown', onWaveformMouseDown);
+    wfCanvas.addEventListener('mousemove', onWaveformMouseMove);
+    wfCanvas.addEventListener('mouseup', onWaveformMouseUp);
+    wfCanvas.addEventListener('mouseleave', onWaveformMouseLeave);
+
+    // ═══ Tab 1: Sweep Transfer Function ═══
+    document.getElementById('tfRefRecordBtn').addEventListener('click', () => tfRecordStep('ref'));
+    document.getElementById('tfRefRedoBtn').addEventListener('click', () => tfRedoStep('ref'));
+    document.getElementById('tfRefNextBtn').addEventListener('click', tfGoToMeasure);
+    document.getElementById('tfMeasRecordBtn').addEventListener('click', () => tfRecordStep('meas'));
+    document.getElementById('tfMeasRedoBtn').addEventListener('click', () => tfRedoStep('meas'));
+    document.getElementById('tfMeasNextBtn').addEventListener('click', tfComputeResult);
+    document.getElementById('tfResetBtn').addEventListener('click', tfReset);
+    document.getElementById('tfExportCsvBtn').addEventListener('click', tfExportCSV);
+
+    // Wizard step click navigation
+    document.getElementById('tfStep0').addEventListener('click', () => tfGoToStep(0));
+    document.getElementById('tfStep1').addEventListener('click', () => tfGoToStep(1));
+    document.getElementById('tfStep2').addEventListener('click', () => tfGoToStep(2));
+
+    // Toggle buttons in results view
+    document.querySelectorAll('.toggle-btn[data-key]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        tfRedrawResult();
+      });
+    });
+
+    // Tab 1 session bundle export/import
+    document.getElementById('tfDlBundleBtn').addEventListener('click', tfExportBundle);
+    document.getElementById('tfImportBundleBtn').addEventListener('click', () => document.getElementById('tfImportBundleInput').click());
+    document.getElementById('tfImportBundleInput').addEventListener('change', tfImportBundle);
+
+    // Tab 1: 레퍼런스/측정 WAV를 각각 독립적으로 불러오기 (세션 번들처럼 짝지어진 게 아니어도 됨)
+    document.getElementById('tfRefImportWavBtn').addEventListener('click', () => document.getElementById('tfRefImportWavInput').click());
+    document.getElementById('tfRefImportWavInput').addEventListener('change', (e) => {
+      tfImportWavFiles('ref', e.target.files);
+      e.target.value = '';
+    });
+    document.getElementById('tfMeasImportWavBtn').addEventListener('click', () => document.getElementById('tfMeasImportWavInput').click());
+    document.getElementById('tfMeasImportWavInput').addEventListener('change', (e) => {
+      tfImportWavFiles('meas', e.target.files);
+      e.target.value = '';
+    });
+
+    // ═══ Tab 2: Water Filling ═══
+    document.getElementById('wfUniformMode').addEventListener('change', wfToggleVolumeMode);
+    document.getElementById('wfVolumeSchedule').addEventListener('input', wfUpdateVolumeScheduleInfo);
+    document.getElementById('wfStartBtn').addEventListener('click', wfStartSession);
+    document.getElementById('wfRefRecordBtn').addEventListener('click', wfRecordReference);
+    document.getElementById('wfRefRedoBtn').addEventListener('click', () => {
+      const btn = document.getElementById('wfRefRecordBtn');
+      btn.disabled = false;
+      btn.textContent = '▶ 레퍼런스 녹음';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      document.getElementById('wfRefRedoBtn').disabled = true;
+      document.getElementById('wfRefNextBtn').disabled = true;
+    });
+    document.getElementById('wfRefNextBtn').addEventListener('click', wfGoToMeasure);
+    document.getElementById('wfRefFinishBtn').addEventListener('click', wfShowResults);
+    document.getElementById('wfMeasRecordBtn').addEventListener('click', wfRecordStep);
+    document.getElementById('wfMeasRedoBtn').addEventListener('click', () => {
+      // Remove the last step since we're redoing
+      if (session.steps.length > 0) session.steps.pop();
+      // Reset record button
+      const btn = document.getElementById('wfMeasRecordBtn');
+      btn.disabled = false;
+      btn.textContent = '▶ 이 스텝 녹음';
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      document.getElementById('wfMeasRedoBtn').disabled = true;
+      document.getElementById('wfMeasNextBtn').disabled = true;
+      hide('wfStepPreview'); hide('wfStepFormants');
+    });
+    document.getElementById('wfMeasNextBtn').addEventListener('click', wfNextStep);
+    document.getElementById('wfFinishBtn').addEventListener('click', wfShowResults);
+    document.getElementById('wfNewSessionBtn').addEventListener('click', wfReset);
+    document.getElementById('wfExportAllBtn').addEventListener('click', wfExportAll);
+    document.getElementById('wfExportV2Btn').addEventListener('click', () => wfExportV2());
+
+    // Tab 2 session bundle export/import
+    document.getElementById('wfDlBundleBtn').addEventListener('click', wfExportBundle);
+    document.getElementById('wfImportBundleBtn').addEventListener('click', () => document.getElementById('wfImportBundleInput').click());
+    document.getElementById('wfImportBundleInput').addEventListener('change', wfImportBundle);
+
+    // Tab 2: A0 레퍼런스 교체 실험
+    document.getElementById('wfA0RecordRefBtn').addEventListener('click', wfA0RecordReference);
+    document.getElementById('wfA0ImportRefBtn').addEventListener('click', () => document.getElementById('wfA0ImportRefInput').click());
+    document.getElementById('wfA0ImportRefInput').addEventListener('change', (e) => {
+      wfA0ImportReference(e.target.files);
+      e.target.value = '';
+    });
+    document.getElementById('wfA0ExportRatioBtn').addEventListener('click', wfA0ExportRatio);
+    document.getElementById('wfA0ExportRawBtn').addEventListener('click', wfA0ExportRawTakes);
+
+    // ═══ Tab 0 Panel Download Buttons ═══
+    document.getElementById('dlWavBtn').addEventListener('click', () => {
+      if (audio.recordedBuffer) {
+        const blob = session.exportWAV(audio.recordedBuffer, audio.sampleRate);
+        session.downloadBlob(blob, `recording_${fileTimestamp()}.wav`);
+      }
+    });
+
+    document.getElementById('dlSpectrogramBtn').addEventListener('click', () => {
+      if (!spectrogramFrames || !audio.recordedBuffer) return;
+      const fftSize = parseInt(document.getElementById('fftSizeSelect').value);
+      const overlap = parseInt(document.getElementById('overlapSlider').value) / 100;
+      const hopSize = Math.round(fftSize * (1 - overlap));
+      const freqPerBin = audio.sampleRate / fftSize;
+      const maxBin = Math.min(spectrogramFrames[0].length, Math.round(8000 / freqPerBin));
+      let csv = 'time_s';
+      for (let b = 0; b < maxBin; b++) csv += `,${(b * freqPerBin).toFixed(1)}Hz`;
+      csv += '\n';
+      spectrogramFrames.forEach((frame, i) => {
+        const t = (i * hopSize + fftSize / 2) / audio.sampleRate;
+        csv += t.toFixed(4);
+        for (let b = 0; b < maxBin; b++) csv += `,${frame[b].toFixed(2)}`;
+        csv += '\n';
+      });
+      session.downloadCSV(csv, `spectrogram_${fileTimestamp()}.csv`);
+    });
+
+    document.getElementById('dlFftBtn').addEventListener('click', () => {
+      if (!currentMagDb) return;
+      const fftSize = currentFftSize || parseInt(document.getElementById('fftSizeSelect').value);
+      const freqPerBin = audio.sampleRate / fftSize;
+      let csv = 'frequency_Hz,magnitude_dB\n';
+      for (let i = 0; i < currentMagDb.length; i++) {
+        csv += `${(i * freqPerBin).toFixed(1)},${currentMagDb[i].toFixed(2)}\n`;
+      }
+      session.downloadCSV(csv, `fft_spectrum_${fileTimestamp()}.csv`);
+    });
+
+    document.getElementById('dlFormantBtn').addEventListener('click', () => {
+      if (!currentFormants || currentFormants.length === 0) return;
+      let csv = 'formant,frequency_Hz,bandwidth_Hz,magnitude_dB\n';
+      currentFormants.forEach((f, i) => {
+        csv += `F${i + 1},${f.freq},${f.bw},${(f.mag || 0).toFixed(2)}\n`;
+      });
+      session.downloadCSV(csv, `formants_${fileTimestamp()}.csv`);
+    });
+
+    // ═══ Tab 1 WAV Download Buttons ═══
+    document.getElementById('tfRefWavBtn').addEventListener('click', () => {
+      if (tfRefRecording) {
+        const blob = session.exportWAV(tfRefRecording, audio.sampleRate);
+        session.downloadBlob(blob, `reference_${fileTimestamp()}.wav`);
+      }
+    });
+
+    document.getElementById('tfMeasWavBtn').addEventListener('click', () => {
+      if (tfMeasRecording) {
+        const blob = session.exportWAV(tfMeasRecording, audio.sampleRate);
+        session.downloadBlob(blob, `measurement_${fileTimestamp()}.wav`);
+      }
+    });
+
+    // ═══ Sidebar Session JSON (context-aware) ═══
+    document.getElementById('exportSessionBtn').addEventListener('click', () => {
+      if (currentTab === 0 && audio.recordedBuffer) {
+        const data = {
+          type: 'recording_analysis',
+          timestamp: new Date().toISOString(),
+          sampleRate: audio.sampleRate,
+          duration: audio.recordedBuffer.length / audio.sampleRate,
+          fftSize: currentFftSize,
+          spectrum: currentMagDb ? { magDb: Array.from(currentMagDb) } : null,
+          formants: currentFormants || [],
+          spectrogramFrameCount: spectrogramFrames ? spectrogramFrames.length : 0
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        session.downloadBlob(blob, `recording_session_${fileTimestamp()}.json`);
+      } else if (currentTab === 1 && tfResult) {
+        const data = {
+          type: 'sweep_transfer_function',
+          timestamp: new Date().toISOString(),
+          sampleRate: audio.sampleRate,
+          sweepConfig: getSweepConfig(),
+          transferFunction: {
+            freqs: Array.from(tfResult.freqs),
+            magDb: Array.from(tfResult.magDb),
+            phase: Array.from(tfResult.phase)
+          },
+          formants: tfFormants,
+          refResult: tfRefResult ? { magDb: Array.from(tfRefResult.magDb), freqs: Array.from(tfRefResult.freqs) } : null,
+          measResult: tfMeasResult ? { magDb: Array.from(tfMeasResult.magDb), freqs: Array.from(tfMeasResult.freqs) } : null
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        session.downloadBlob(blob, `tf_session_${fileTimestamp()}.json`);
+      } else if (currentTab === 2 && session.steps && session.steps.length > 0) {
+        const data = {
+          type: 'water_filling',
+          timestamp: new Date().toISOString(),
+          sampleRate: audio.sampleRate,
+          steps: session.steps.map(s => ({
+            volume_mL: s.volume_mL,
+            formants: s.formants,
+            deconvResult: s.deconvResult ? {
+              freqs: Array.from(s.deconvResult.freqs),
+              magDb: Array.from(s.deconvResult.magDb)
+            } : null
+          }))
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        session.downloadBlob(blob, `water_filling_session_${fileTimestamp()}.json`);
+      }
+    });
+  }
+
+
+  // ─── Helpers ────────────────────────────────────────────
+  function fileTimestamp() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  }
+  function show(id) { document.getElementById(id).classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id).classList.add('hidden'); }
+  function setStatus(text, state) {
+    document.getElementById('statusText').textContent = text;
+    const dot = document.getElementById('statusDot');
+    dot.className = 'status-dot' + (state ? ` ${state}` : '');
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // Tab 0: Record / Analyze
+  // ═══════════════════════════════════════════════════════
+
+  async function toggleRecording() {
+    const btn = document.getElementById('recordBtn');
+    if (audio.isRecording) {
+      // Stop
+      btn.textContent = '⏳ 처리 중...';
+      btn.disabled = true;
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
+      hide('recordingTimer');
+      try {
+        await audio.stopRecording();
+        setStatus('녹음 완료', 'active');
+        show('dlWavBtn');
+        updateExportButtons();
+        show('playBtn');
+        drawRecordedState();
+      } catch (e) {
+        console.error('Stop recording error:', e);
+        setStatus('디코딩 실패', 'error');
+      }
+      btn.textContent = '⏺ 녹음 시작';
+      btn.classList.remove('recording');
+      btn.disabled = false;
+    } else {
+      // Start
+      try {
+        if (!audio.permissionGranted) {
+          alert('마이크 권한이 필요합니다. 페이지를 새로고침하세요.');
+          return;
+        }
+        audio.startRecording(); // synchronous — no getUserMedia
+        btn.textContent = '⏹ 녹음 중지';
+        btn.classList.add('recording');
+        setStatus('녹음 중...', 'recording');
+        hide('spectrogramPanel');
+        hide('formantPanel');
+        hide('playBtn');
+        show('recordingTimer');
+        selectionStart = null; selectionEnd = null;
+        animateRealtime();
+      } catch (e) {
+        console.error('Recording error:', e);
+        alert('녹음 실패: ' + e.message);
+      }
+    }
+  }
+
+  function animateRealtime() {
+    if (!audio.isRecording) return;
+
+    // Update timer display
+    const elapsed = audio.getElapsedTime();
+    const min = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const sec = Math.floor(elapsed % 60).toString().padStart(2, '0');
+    const ms = Math.floor((elapsed % 1) * 10);
+    document.getElementById('recordingTimer').textContent = `● ${min}:${sec}.${ms}`;
+    document.getElementById('statusDuration').textContent = elapsed.toFixed(1);
+
+    const analyser = audio.analyserNode;
+    if (analyser) {
+      const bufLen = analyser.frequencyBinCount;
+
+      // Real-time waveform: use Float32 for proper amplitude
+      const timeFloat = new Float32Array(bufLen);
+      analyser.getFloatTimeDomainData(timeFloat);
+      Viz.drawWaveform(document.getElementById('waveformCanvas'), timeFloat);
+
+      // Real-time FFT: use Float32 for proper dB values
+      const freqFloat = new Float32Array(bufLen);
+      analyser.getFloatFrequencyData(freqFloat);
+      // getFloatFrequencyData returns dB FS values (typically -100 to 0)
+      Viz.drawSpectrum(document.getElementById('spectrumCanvas'), freqFloat, audio.sampleRate, analyser.fftSize, {
+        maxFreq: 8000, autoRange: true
+      });
+    }
+
+    animFrameId = requestAnimationFrame(animateRealtime);
+  }
+
+  // ─── Playback ──────────────────────────────────────────
+  let playbackSource = null;
+
+  function stopPlayback() {
+    if (playbackSource) {
+      try { playbackSource.stop(); } catch(e) {}
+      playbackSource = null;
+    }
+    if (playbackAnimId) {
+      cancelAnimationFrame(playbackAnimId);
+      playbackAnimId = null;
+    }
+    document.getElementById('playBtn').textContent = '▶ 재생';
+  }
+
+  async function playRecording() {
+    if (!audio.recordedBuffer || !audio.audioCtx) return;
+
+    if (playbackSource) {
+      stopPlayback();
+      drawWaveformWithOverlays();
+      return;
+    }
+
+    // Determine play range
+    const totalDur = audio.recordedBuffer.length / audio.sampleRate;
+    let startSec = 0, endSec = totalDur;
+    if (selectionStart !== null && selectionEnd !== null) {
+      startSec = Math.min(selectionStart, selectionEnd) * totalDur;
+      endSec = Math.max(selectionStart, selectionEnd) * totalDur;
+    }
+    playbackOffset = startSec;
+    playbackDuration = endSec - startSec;
+
+    if (audio.audioCtx.state === 'suspended') await audio.audioCtx.resume();
+
+    const buffer = audio.audioCtx.createBuffer(1, audio.recordedBuffer.length, audio.sampleRate);
+    buffer.getChannelData(0).set(audio.recordedBuffer);
+    playbackSource = audio.audioCtx.createBufferSource();
+    playbackSource.buffer = buffer;
+    playbackSource.connect(audio.audioCtx.destination);
+    playbackSource.onended = () => {
+      stopPlayback();
+      drawWaveformWithOverlays();
+    };
+    document.getElementById('playBtn').textContent = '⏹ 정지';
+    playbackStartTime = audio.audioCtx.currentTime;
+    playbackSource.start(0, startSec, playbackDuration);
+    animatePlayback();
+  }
+
+  async function playRegion(startNorm, endNorm) {
+    if (!audio.recordedBuffer || !audio.audioCtx) return;
+    stopPlayback();
+
+    const totalDur = audio.recordedBuffer.length / audio.sampleRate;
+    playbackOffset = startNorm * totalDur;
+    playbackDuration = (endNorm - startNorm) * totalDur;
+
+    if (audio.audioCtx.state === 'suspended') await audio.audioCtx.resume();
+
+    const buffer = audio.audioCtx.createBuffer(1, audio.recordedBuffer.length, audio.sampleRate);
+    buffer.getChannelData(0).set(audio.recordedBuffer);
+    playbackSource = audio.audioCtx.createBufferSource();
+    playbackSource.buffer = buffer;
+    playbackSource.connect(audio.audioCtx.destination);
+    playbackSource.onended = () => {
+      stopPlayback();
+      drawWaveformWithOverlays();
+    };
+    document.getElementById('playBtn').textContent = '⏹ 정지';
+    show('playBtn');
+    playbackStartTime = audio.audioCtx.currentTime;
+    playbackSource.start(0, playbackOffset, playbackDuration);
+    animatePlayback();
+  }
+
+  function animatePlayback() {
+    if (!playbackSource) return;
+    const elapsed = audio.audioCtx.currentTime - playbackStartTime;
+    const totalDur = audio.recordedBuffer.length / audio.sampleRate;
+    const currentPos = (playbackOffset + elapsed) / totalDur;
+    drawWaveformWithOverlays(currentPos);
+    playbackAnimId = requestAnimationFrame(animatePlayback);
+  }
+
+  // Helper: redraw waveform with all overlays (marker, selection, playback)
+  function drawWaveformWithOverlays(playPos) {
+    if (!audio.recordedBuffer) return;
+    Viz.drawWaveform(document.getElementById('waveformCanvas'), audio.recordedBuffer, {
+      marker: spectrogramClickPos,
+      playbackPos: playPos || null,
+      selection: (selectionStart !== null && selectionEnd !== null &&
+                  Math.abs(selectionEnd - selectionStart) > 0.003)
+                  ? [selectionStart, selectionEnd] : null
+    });
+  }
+
+  function drawRecordedState() {
+    if (!audio.recordedBuffer) return;
+    const buf = audio.recordedBuffer;
+
+    // Waveform
+    drawWaveformWithOverlays();
+    document.getElementById('waveformInfo').textContent =
+      `${(buf.length / audio.sampleRate).toFixed(2)}s | ${audio.sampleRate}Hz`;
+    document.getElementById('statusDuration').textContent = (buf.length / audio.sampleRate).toFixed(1);
+
+    // Spectrogram
+    const fftSize = parseInt(document.getElementById('fftSizeSelect').value);
+    const overlap = parseInt(document.getElementById('overlapSlider').value) / 100;
+    const hopSize = Math.round(fftSize * (1 - overlap));
+    const winType = document.getElementById('windowSelect').value;
+    spectrogramFrames = DSP.stft(buf, fftSize, hopSize, winType);
+
+    // Compute formant tracks for spectrogram overlay (Praat-style)
+    const lpcOrder = parseInt(document.getElementById('lpcOrderSlider').value);
+    const maxFormantFreq = parseFloat(document.getElementById('maxFormantFreq').value);
+    const maxBw = parseFloat(document.getElementById('maxBwSlider').value);
+    const formantTracks = [];
+    const trackStep = Math.max(1, Math.floor(spectrogramFrames.length / 200)); // limit computation
+    for (let i = 0; i < spectrogramFrames.length; i++) {
+      if (i % trackStep !== 0) {
+        formantTracks.push(formantTracks.length > 0 ? formantTracks[formantTracks.length - 1] : null);
+        continue;
+      }
+      // Extract the corresponding time-domain frame
+      const center = i * hopSize + fftSize / 2;
+      const frameStart = Math.max(0, Math.round(center - fftSize / 2));
+      const frameEnd = Math.min(buf.length, frameStart + fftSize);
+      const frame = buf.slice(frameStart, frameEnd);
+      if (frame.length < lpcOrder * 2) { formantTracks.push(null); continue; }
+      try {
+        const { formants } = DSP.extractFormants(frame, audio.sampleRate, lpcOrder, maxFormantFreq, maxBw, fftSize);
+        formantTracks.push(formants.length > 0 ? formants : null);
+      } catch (e) {
+        formantTracks.push(null);
+      }
+    }
+
+    show('spectrogramPanel');
+    Viz.drawSpectrogram(document.getElementById('spectrogramCanvas'),
+      spectrogramFrames, audio.sampleRate, fftSize, {
+        maxFreq: 8000, minDb: -80, maxDb: 0, marker: spectrogramClickPos,
+        formantTracks: formantTracks
+      });
+
+    if (spectrogramClickPos !== null) {
+      analyzeAtPosition(spectrogramClickPos);
+    } else {
+      analyzeAtPosition(0.5);
+    }
+  }
+
+  function onSpectrogramClick(e) {
+    if (!audio.recordedBuffer) return;
+    const rect = e.target.getBoundingClientRect();
+    spectrogramClickPos = (e.clientX - rect.left) / rect.width;
+    selectionStart = null; selectionEnd = null;
+    drawRecordedState();
+  }
+
+  function onSpectrogramHover(e) {
+    const rect = e.target.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = 1 - (e.clientY - rect.top) / rect.height;
+    const maxFreq = 8000;
+    const freq = y * maxFreq;
+    const time = x * (audio.recordedBuffer ? audio.recordedBuffer.length / audio.sampleRate : 0);
+    document.getElementById('spectrogramCursor').textContent =
+      `${time.toFixed(3)}s | ${freq.toFixed(0)} Hz`;
+  }
+
+  // ─── Waveform mouse interaction (drag selection + click analysis) ───
+  function onWaveformMouseDown(e) {
+    if (!audio.recordedBuffer || audio.isRecording) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    isDragging = true;
+    dragStartX = x;
+    selectionStart = x;
+    selectionEnd = x;
+  }
+
+  function onWaveformMouseMove(e) {
+    if (!audio.recordedBuffer || audio.isRecording) return;
+    const rect = e.target.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const time = x * audio.recordedBuffer.length / audio.sampleRate;
+
+    if (isDragging) {
+      selectionEnd = Math.max(0, Math.min(1, x));
+      drawWaveformWithOverlays();
+      const s = Math.min(selectionStart, selectionEnd);
+      const en = Math.max(selectionStart, selectionEnd);
+      const totalDur = audio.recordedBuffer.length / audio.sampleRate;
+      document.getElementById('waveformInfo').textContent =
+        `선택: ${(s * totalDur).toFixed(3)}s ~ ${(en * totalDur).toFixed(3)}s (²${((en - s) * totalDur).toFixed(3)}s)`;
+    } else {
+      document.getElementById('waveformInfo').textContent =
+        `${(audio.recordedBuffer.length / audio.sampleRate).toFixed(2)}s | ${audio.sampleRate}Hz | 커서: ${time.toFixed(3)}s`;
+    }
+  }
+
+  function onWaveformMouseUp(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    if (!audio.recordedBuffer) return;
+    const rect = e.target.getBoundingClientRect();
+    selectionEnd = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+
+    const dist = Math.abs(selectionEnd - dragStartX);
+    if (dist < 0.008) {
+      // Single click — analyze at this point
+      spectrogramClickPos = dragStartX;
+      selectionStart = null;
+      selectionEnd = null;
+      drawRecordedState();
+    } else {
+      // Drag selection — play the selected region
+      const s = Math.min(selectionStart, selectionEnd);
+      const en = Math.max(selectionStart, selectionEnd);
+      selectionStart = s;
+      selectionEnd = en;
+      drawWaveformWithOverlays();
+      playRegion(s, en);
+    }
+  }
+
+  function onWaveformMouseLeave(e) {
+    if (isDragging) {
+      isDragging = false;
+      // Keep the selection if meaningful
+      if (selectionStart !== null && selectionEnd !== null &&
+          Math.abs(selectionEnd - selectionStart) < 0.008) {
+        selectionStart = null;
+        selectionEnd = null;
+        drawWaveformWithOverlays();
+      }
+    }
+  }
+
+  function analyzeAtPosition(pos) {
+    if (!audio.recordedBuffer || !spectrogramFrames) return;
+    const buf = audio.recordedBuffer;
+    const fftSize = parseInt(document.getElementById('fftSizeSelect').value);
+    const sampleIdx = Math.floor(pos * buf.length);
+    const start = Math.max(0, sampleIdx - fftSize / 2);
+    const end = Math.min(buf.length, start + fftSize);
+    const frame = buf.slice(start, end);
+
+    // FFT
+    const winType = document.getElementById('windowSelect').value;
+    const magDb = DSP.powerSpectrum(frame, fftSize, winType);
+    currentMagDb = magDb;
+    currentFftSize = fftSize;
+
+    // LPC
+    const order = parseInt(document.getElementById('lpcOrderSlider').value);
+    const maxFreq = parseFloat(document.getElementById('maxFormantFreq').value);
+    const maxBw = parseFloat(document.getElementById('maxBwSlider').value);
+    const { formants, envelope } = DSP.extractFormants(frame, audio.sampleRate, order, maxFreq, maxBw, fftSize);
+    currentFormants = formants;
+
+    // Draw with auto-ranging
+    Viz.drawSpectrum(document.getElementById('spectrumCanvas'), magDb, audio.sampleRate, fftSize, {
+      maxFreq: 8000, autoRange: true,
+      lpcEnvelope: envelope,
+      formants: formants
+    });
+
+    const time = pos * buf.length / audio.sampleRate;
+    document.getElementById('spectrumInfo').textContent = `t = ${time.toFixed(3)}s`;
+
+    // Formant badges
+    show('formantPanel');
+    show('dlFftBtn');
+    Viz.showFormants('formantDisplay', formants);
+  }
+
+  async function loadAudioFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setStatus('파일 로딩 중...', '');
+    try {
+      if (!audio.audioCtx) await audio.init();
+      await audio.decodeAudioFile(file);
+      setStatus('파일 로드 완료', 'active');
+      show('dlWavBtn');
+      updateExportButtons();
+      spectrogramClickPos = null;
+      drawRecordedState();
+    } catch (err) {
+      alert('파일 로드 실패: ' + err.message);
+      setStatus('오류', '');
+    }
+    e.target.value = '';
+  }
+
+
+  // ═══════════════════════════════════════════════════════
+  // Tab 1: Sweep Transfer Function
+  // ═══════════════════════════════════════════════════════
+
+  let tfRefRecording = null;
+  let tfMeasRecording = null;
+  let tfSweepSignal = null;
+  let tfResult = null;
+  let tfRefResult = null;   // deconvolved reference
+  let tfMeasResult = null;  // deconvolved measurement
+  let tfFormants = null;
+  let tfPeaks = null;
+  let tfCurrentWizardStep = 0;
+
+  function getSweepConfig() {
+    return {
+      f1: parseFloat(document.getElementById('sweepStartFreq').value),
+      f2: parseFloat(document.getElementById('sweepEndFreq').value),
+      duration: parseFloat(document.getElementById('sweepDuration').value),
+      volume: parseInt(document.getElementById('sweepVolume').value) / 100
+    };
+  }
+
+  // ─── Tab 1 Session Bundle Export/Import ──────────────────
+  function getAnalysisConfig() {
+    return {
+      fftSize: parseInt(document.getElementById('fftSizeSelect').value),
+      lpcOrder: parseInt(document.getElementById('lpcOrderSlider').value),
+      maxFormantFreq: parseFloat(document.getElementById('maxFormantFreq').value),
+      maxBw: parseFloat(document.getElementById('maxBwSlider').value)
+    };
+  }
+
+  function applyConfig(cfg) {
+    if (cfg.sweepConfig) {
+      document.getElementById('sweepStartFreq').value = cfg.sweepConfig.f1;
+      document.getElementById('sweepEndFreq').value = cfg.sweepConfig.f2;
+      document.getElementById('sweepDuration').value = cfg.sweepConfig.duration;
+      document.getElementById('sweepVolume').value = Math.round(cfg.sweepConfig.volume * 100);
+      const durDisp = document.getElementById('sweepDurValue');
+      const volDisp = document.getElementById('sweepVolValue');
+      if (durDisp) durDisp.textContent = parseFloat(cfg.sweepConfig.duration).toFixed(1);
+      if (volDisp) volDisp.textContent = Math.round(cfg.sweepConfig.volume * 100) + '%';
+    }
+    if (cfg.analysisConfig) {
+      document.getElementById('fftSizeSelect').value = cfg.analysisConfig.fftSize;
+      document.getElementById('lpcOrderSlider').value = cfg.analysisConfig.lpcOrder;
+      document.getElementById('maxFormantFreq').value = cfg.analysisConfig.maxFormantFreq;
+      document.getElementById('maxBwSlider').value = cfg.analysisConfig.maxBw;
+      const orderDisp = document.getElementById('lpcOrderValue');
+      const bwDisp = document.getElementById('maxBwValue');
+      if (orderDisp) orderDisp.textContent = cfg.analysisConfig.lpcOrder;
+      if (bwDisp) bwDisp.textContent = cfg.analysisConfig.maxBw;
+    }
+  }
+
+  async function tfExportBundle() {
+    if (!tfRefRecording || !tfMeasRecording) return;
+    const statusEl = document.getElementById('tfImportStatus');
+    setStatus('세션 번들 생성 중...', '');
+
+    const zip = new JSZip();
+    const meta = {
+      version: 1,
+      type: 'sweep_transfer_function',
+      timestamp: new Date().toISOString(),
+      sampleRate: audio.sampleRate,
+      sweepConfig: getSweepConfig(),
+      analysisConfig: getAnalysisConfig(),
+      files: { reference: 'reference.wav', measurement: 'measurement.wav' }
+    };
+    zip.file('session.json', JSON.stringify(meta, null, 2));
+
+    const refBlob = session.exportWAV(tfRefRecording, audio.sampleRate);
+    zip.file('reference.wav', refBlob);
+    const measBlob = session.exportWAV(tfMeasRecording, audio.sampleRate);
+    zip.file('measurement.wav', measBlob);
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    session.downloadBlob(content, `tf_session_${fileTimestamp()}.zip`);
+    setStatus('세션 번들 저장 완료', 'active');
+  }
+
+  async function tfImportBundle(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('tfImportStatus');
+    statusEl.textContent = '📦 번들 로드 중...';
+
+    try {
+      if (!audio.audioCtx) await audio.init();
+      const zip = await JSZip.loadAsync(file);
+
+      // Read metadata
+      const metaFile = zip.file('session.json');
+      if (!metaFile) throw new Error('session.json이 없습니다');
+      const meta = JSON.parse(await metaFile.async('string'));
+
+      // Apply settings
+      applyConfig(meta);
+      if (meta.sampleRate) audio.sampleRate = meta.sampleRate;
+
+      // Generate sweep from saved config
+      const cfg = meta.sweepConfig || getSweepConfig();
+      tfSweepSignal = DSP.generateLogSweep(cfg.f1, cfg.f2, cfg.duration, audio.sampleRate, cfg.volume || 0.5);
+
+      // Decode WAVs
+      const refData = await zip.file(meta.files.reference).async('arraybuffer');
+      const refDecoded = await audio.audioCtx.decodeAudioData(refData);
+      tfRefRecording = refDecoded.getChannelData(0);
+
+      const measData = await zip.file(meta.files.measurement).async('arraybuffer');
+      const measDecoded = await audio.audioCtx.decodeAudioData(measData);
+      tfMeasRecording = measDecoded.getChannelData(0);
+
+      // 번들은 테이크 1개(구버전 포맷)이므로 결합 없이 바로 디컨볼브
+      tfRefResult = DSP.deconvolve(tfRefRecording, tfSweepSignal, audio.sampleRate);
+      tfMeasResult = DSP.deconvolve(tfMeasRecording, tfSweepSignal, audio.sampleRate);
+
+      // Show previews
+      show('tfRefPreview'); show('tfRefActions');
+      show('tfMeasPreview'); show('tfMeasActions');
+      requestAnimationFrame(() => {
+        Viz.drawWaveform(document.getElementById('tfRefWaveCanvas'), tfRefRecording);
+        Viz.drawWaveform(document.getElementById('tfMeasWaveCanvas'), tfMeasRecording);
+      });
+
+      statusEl.textContent = '✅ 번들 로드 → 전달함수 계산 중...';
+      setTimeout(() => {
+        tfComputeResult();
+        statusEl.textContent = `✅ 분석 완료! (${meta.timestamp || ''})`;
+      }, 100);
+    } catch (err) {
+      statusEl.textContent = `❌ 번들 로드 실패: ${err.message}`;
+    }
+    e.target.value = '';
+  }
+
+  async function tfRecordStep(type) {
+    const cfg = getSweepConfig();
+    tfSweepSignal = DSP.generateLogSweep(cfg.f1, cfg.f2, cfg.duration, audio.sampleRate, cfg.volume);
+    const btn = document.getElementById(type === 'ref' ? 'tfRefRecordBtn' : 'tfMeasRecordBtn');
+    const repeat = Math.max(1, parseInt(document.getElementById(
+      type === 'ref' ? 'tfRefRepeat' : 'tfMeasRepeat').value) || 1);
+    btn.disabled = true;
+
+    try {
+      const recordings = [];
+      for (let i = 0; i < repeat; i++) {
+        const label = repeat > 1 ? ` (${i + 1}/${repeat})` : '';
+        btn.textContent = `🔄 녹음 중...${label}`;
+        setStatus(`${type === 'ref' ? '레퍼런스' : '측정'} 스윕 녹음 중...${label}`, 'recording');
+        recordings.push(await audio.playAndRecord(tfSweepSignal));
+      }
+      // 각 테이크를 독립적으로 디컨볼브 → 주파수별 dB 중앙값으로 결합
+      const results = recordings.map(rec => DSP.deconvolve(rec, tfSweepSignal, audio.sampleRate));
+      const combined = combineDeconvResults(results);
+
+      if (type === 'ref') {
+        tfRefRecording = recordings[0];   // 미리듣기·WAV 저장용 대표 테이크
+        tfRefResult = combined;
+        show('tfRefPreview');
+        show('tfRefActions');
+        // Draw AFTER show — canvas needs non-zero parent width
+        requestAnimationFrame(() => Viz.drawWaveform(document.getElementById('tfRefWaveCanvas'), recordings[0]));
+      } else {
+        tfMeasRecording = recordings[0];
+        tfMeasResult = combined;
+        show('tfMeasPreview');
+        show('tfMeasActions');
+        requestAnimationFrame(() => Viz.drawWaveform(document.getElementById('tfMeasWaveCanvas'), recordings[0]));
+      }
+      setStatus(repeat > 1 ? `녹음 완료 (${repeat}회 중앙값)` : '녹음 완료', 'active');
+      updateExportButtons();
+    } catch (e) {
+      alert('녹음 실패: ' + e.message);
+      setStatus('오류', '');
+    }
+    btn.disabled = false;
+    btn.textContent = type === 'ref' ? '▶ 레퍼런스 녹음' : '▶ 측정 녹음';
+  }
+
+  // 세션 번들(.zip)은 레퍼런스+측정이 항상 한 쌍으로 묶여 있어 다루기 번거로운 경우가
+  // 있다 — 예를 들어 레퍼런스 후보 여러 개를 같은 측정 하나에 갈아끼워 보고 싶을 때.
+  // 이 함수는 레퍼런스/측정 WAV를 서로 독립적으로, 몇 개든 불러올 수 있게 한다
+  // (여러 개 선택 시 tfRecordStep과 동일하게 각자 디컨볼브 후 dB 중앙값으로 결합).
+  async function tfImportWavFiles(type, fileList) {
+    if (!fileList || fileList.length === 0) return;
+    try {
+      if (!audio.audioCtx) await audio.init();
+      if (!tfSweepSignal) {
+        const cfg = getSweepConfig();
+        tfSweepSignal = DSP.generateLogSweep(cfg.f1, cfg.f2, cfg.duration, audio.sampleRate, cfg.volume);
+      }
+      const names = [];
+      const recordings = [];
+      for (const file of fileList) {
+        const buf = await file.arrayBuffer();
+        const decoded = await audio.audioCtx.decodeAudioData(buf);
+        recordings.push(decoded.getChannelData(0));
+        names.push(file.name);
+      }
+      const results = recordings.map(rec => DSP.deconvolve(rec, tfSweepSignal, audio.sampleRate));
+      const combined = combineDeconvResults(results);
+
+      if (type === 'ref') {
+        tfRefRecording = recordings[0];   // 미리듣기·WAV 저장용 대표 테이크
+        tfRefResult = combined;
+        show('tfRefPreview');
+        show('tfRefActions');
+        requestAnimationFrame(() => Viz.drawWaveform(document.getElementById('tfRefWaveCanvas'), recordings[0]));
+      } else {
+        tfMeasRecording = recordings[0];
+        tfMeasResult = combined;
+        show('tfMeasPreview');
+        show('tfMeasActions');
+        requestAnimationFrame(() => Viz.drawWaveform(document.getElementById('tfMeasWaveCanvas'), recordings[0]));
+      }
+      setStatus(`${type === 'ref' ? '레퍼런스' : '측정'} WAV ${recordings.length}개 불러옴 — ${names.join(', ')}`, 'active');
+      updateExportButtons();
+    } catch (e) {
+      alert('WAV 불러오기 실패: ' + e.message);
+    }
+  }
+
+  function tfRedoStep(type) {
+    if (type === 'ref') {
+      hide('tfRefPreview'); hide('tfRefActions');
+      tfRefRecording = null;
+      tfRefResult = null;
+    } else {
+      hide('tfMeasPreview'); hide('tfMeasActions');
+      tfMeasRecording = null;
+      tfMeasResult = null;
+    }
+  }
+
+  // ─── Wizard Navigation ─────────────────────────────
+  function tfShowWizardPanel(step) {
+    hide('tfWizard0'); hide('tfWizard1'); hide('tfWizard2');
+    show(`tfWizard${step}`);
+    tfCurrentWizardStep = step;
+
+    // Update step indicators
+    [0, 1, 2].forEach(i => {
+      const el = document.getElementById(`tfStep${i}`);
+      el.classList.remove('active');
+      if (i < step || (i <= 1 && ((i === 0 && tfRefRecording) || (i === 1 && tfMeasRecording)))) {
+        el.classList.add('done');
+      }
+      if (i === step) {
+        el.classList.add('active');
+        el.classList.remove('done');
+      }
+    });
+    // If going back to completed step, mark it active+done
+    if (step === 2 && tfResult) {
+      document.getElementById('tfStep2').classList.add('active');
+    }
+  }
+
+  function tfGoToStep(step) {
+    // Only allow navigating to completed steps or current step
+    if (step === 0 && !tfRefRecording && tfCurrentWizardStep !== 0) return;
+    if (step === 1 && !tfRefRecording) return;
+    if (step === 2 && !tfResult) return;
+
+    tfShowWizardPanel(step);
+
+    // Redraw canvases after show (they need visible parent for dimensions)
+    requestAnimationFrame(() => {
+      if (step === 0 && tfRefRecording) {
+        show('tfRefPreview'); show('tfRefActions');
+        Viz.drawWaveform(document.getElementById('tfRefWaveCanvas'), tfRefRecording);
+      }
+      if (step === 1 && tfMeasRecording) {
+        show('tfMeasPreview'); show('tfMeasActions');
+        Viz.drawWaveform(document.getElementById('tfMeasWaveCanvas'), tfMeasRecording);
+      }
+      if (step === 2) {
+        tfRedrawResult();
+      }
+    });
+  }
+
+  function tfGoToMeasure() {
+    tfShowWizardPanel(1);
+  }
+
+  function tfComputeResult() {
+    if (!tfRefResult || !tfMeasResult || !tfSweepSignal) return;
+    setStatus('디컨볼루션 계산 중...', '');
+
+    // tfRefResult/tfMeasResult는 녹음(또는 번들 로드) 시점에 이미 계산되어 있음 —
+    // 반복 촬영을 했다면 그 시점에 주파수별 dB 중앙값 결합까지 끝난 결과다.
+
+    // H_cup = H_meas / H_ref (in frequency domain: subtract in dB)
+    const N = Math.min(tfRefResult.magDb.length, tfMeasResult.magDb.length);
+    const cupMagDb = new Float64Array(N);
+    const cupPhase = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      cupMagDb[i] = tfMeasResult.magDb[i] - tfRefResult.magDb[i];
+      cupPhase[i] = tfMeasResult.phase[i] - tfRefResult.phase[i];
+    }
+
+    tfResult = {
+      freqs: tfMeasResult.freqs.slice(0, N),
+      magDb: cupMagDb,
+      phase: cupPhase,
+      impulseResponse: tfMeasResult.impulseResponse,
+      N: tfMeasResult.N,
+      sampleRate: audio.sampleRate
+    };
+
+    // Formant extraction from transfer function
+    const fftSize = parseInt(document.getElementById('fftSizeSelect').value);
+    const order = parseInt(document.getElementById('lpcOrderSlider').value);
+    const maxFreq = parseFloat(document.getElementById('maxFormantFreq').value);
+    const maxBw = parseFloat(document.getElementById('maxBwSlider').value);
+
+    // Use the impulse response for LPC
+    let maxVal = 0, maxIdx = 0;
+    const ir = tfMeasResult.impulseResponse;
+    for (let i = 0; i < ir.length; i++) {
+      if (Math.abs(ir[i]) > maxVal) { maxVal = Math.abs(ir[i]); maxIdx = i; }
+    }
+    const irSlice = ir.slice(maxIdx, Math.min(ir.length, maxIdx + fftSize));
+    const result = DSP.extractFormants(irSlice, audio.sampleRate, order, maxFreq, maxBw, fftSize);
+    tfFormants = result.formants;
+    tfPeaks = DSP.findPeaks(cupMagDb, audio.sampleRate, tfMeasResult.N, 3);
+
+    // Navigate to results
+    tfShowWizardPanel(2);
+    document.getElementById('tfStep0').classList.add('done');
+    document.getElementById('tfStep1').classList.add('done');
+
+    // Reset toggles to all active
+    document.querySelectorAll('.toggle-btn[data-key]').forEach(b => b.classList.add('active'));
+
+    requestAnimationFrame(() => {
+      tfRedrawResult();
+      Viz.drawImpulseResponse(document.getElementById('tfImpulseCanvas'), tfMeasResult.impulseResponse);
+      Viz.showFormants('tfFormantDisplay', tfFormants);
+    });
+
+    setStatus('전달함수 계산 완료', 'active');
+    updateExportButtons();
+  }
+
+  // ─── Toggle Overlay Drawing ────────────────────────
+  function tfRedrawResult() {
+    if (!tfResult) return;
+    const canvas = document.getElementById('tfResultCanvas');
+    const { ctx, w, h } = Viz.getCanvas(canvas);
+
+    const showRef = document.getElementById('tfToggleRef').classList.contains('active');
+    const showMeas = document.getElementById('tfToggleMeas').classList.contains('active');
+    const showTF = document.getElementById('tfToggleTF').classList.contains('active');
+
+    const maxFreq = 8000;
+    const margin = { top: 10, bottom: 30, left: 50, right: 10 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+
+    // Auto-range: find visible data range
+    let allMin = Infinity, allMax = -Infinity;
+    const scanRange = (magDb, N, sr) => {
+      const maxBin = Math.min(magDb.length, Math.round(maxFreq / sr * N));
+      for (let i = 1; i < maxBin; i++) {
+        if (isFinite(magDb[i])) {
+          if (magDb[i] < allMin) allMin = magDb[i];
+          if (magDb[i] > allMax) allMax = magDb[i];
+        }
+      }
+    };
+    if (showRef && tfRefResult) scanRange(tfRefResult.magDb, tfRefResult.N, tfRefResult.sampleRate);
+    if (showMeas && tfMeasResult) scanRange(tfMeasResult.magDb, tfMeasResult.N, tfMeasResult.sampleRate);
+    if (showTF) scanRange(tfResult.magDb, tfResult.N, tfResult.sampleRate);
+
+    if (!isFinite(allMin)) allMin = -80;
+    if (!isFinite(allMax)) allMax = 0;
+    const rangePad = (allMax - allMin) * 0.1 || 10;
+    const minDb = Math.floor((allMin - rangePad) / 10) * 10;
+    const maxDb = Math.ceil((allMax + rangePad) / 10) * 10;
+
+    // Clear and draw grid
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = 'rgba(48,54,61,0.8)';
+    ctx.fillStyle = '#484f58';
+    ctx.font = '10px Consolas, monospace';
+    ctx.lineWidth = 0.5;
+
+    const freqSteps = [100, 200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 8000];
+    for (const f of freqSteps) {
+      if (f > maxFreq) break;
+      const x = margin.left + (f / maxFreq) * plotW;
+      ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, h - margin.bottom); ctx.stroke();
+      ctx.fillText(f >= 1000 ? `${f/1000}k` : f, x - 10, h - margin.bottom + 14);
+    }
+    for (let db = minDb; db <= maxDb; db += 20) {
+      const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+      ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(w - margin.right, y); ctx.stroke();
+      ctx.fillText(`${db}`, margin.left - 35, y + 4);
+    }
+
+    // Helper: draw a spectrum line
+    const drawLine = (magDb, N, sr, color, lineW, alpha) => {
+      const maxBin = Math.min(magDb.length, Math.round(maxFreq / sr * N));
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineW;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      for (let i = 0; i < maxBin; i++) {
+        const x = margin.left + (i / maxBin) * plotW;
+        const db = isFinite(magDb[i]) ? Math.max(minDb, Math.min(maxDb, magDb[i])) : minDb;
+        const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+
+    // Draw in order: ref (back) → meas → tf (front)
+    if (showRef && tfRefResult) drawLine(tfRefResult.magDb, tfRefResult.N, tfRefResult.sampleRate, '#39d2c0', 1.5, 0.7);
+    if (showMeas && tfMeasResult) drawLine(tfMeasResult.magDb, tfMeasResult.N, tfMeasResult.sampleRate, '#d29922', 1.5, 0.7);
+    if (showTF) drawLine(tfResult.magDb, tfResult.N, tfResult.sampleRate, '#58a6ff', 2, 1.0);
+
+    // Formant markers on TF
+    if (showTF && tfFormants) {
+      tfFormants.forEach((f, idx) => {
+        const x = margin.left + (f.freq / maxFreq) * plotW;
+        // Find the dB value from tfResult
+        const bin = Math.round(f.freq / tfResult.sampleRate * tfResult.N);
+        const db = bin < tfResult.magDb.length ? Math.max(minDb, Math.min(maxDb, tfResult.magDb[bin])) : 0;
+        const y = margin.top + (1 - (db - minDb) / (maxDb - minDb)) * plotH;
+        ctx.fillStyle = Viz.COLORS.formantColors[idx % Viz.COLORS.formantColors.length];
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill();
+        ctx.font = 'bold 11px Consolas';
+        ctx.fillText(`F${idx + 1}`, x - 6, y - 10);
+      });
+    }
+
+    // Legend
+    const legendY = margin.top + 8;
+    let legendX = margin.left + 8;
+    const drawLegend = (label, color, active) => {
+      if (!active) return;
+      ctx.fillStyle = color;
+      ctx.fillRect(legendX, legendY, 16, 3);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(label, legendX + 20, legendY + 5);
+      legendX += ctx.measureText(label).width + 36;
+    };
+    drawLegend('레퍼런스', '#39d2c0', showRef);
+    drawLegend('측정', '#d29922', showMeas);
+    drawLegend('전달함수 (측정−레퍼런스)', '#58a6ff', showTF);
+
+    // Axis labels
+    ctx.fillStyle = '#484f58';
+    ctx.font = '11px sans-serif';
+    ctx.fillText('Hz', w - margin.right - 15, h - margin.bottom + 14);
+    ctx.save();
+    ctx.translate(12, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('dB', 0, 0);
+    ctx.restore();
+  }
+
+  function tfReset() {
+    tfRefRecording = null; tfMeasRecording = null; tfSweepSignal = null;
+    tfResult = null; tfRefResult = null; tfMeasResult = null;
+    tfFormants = null; tfPeaks = null;
+    tfCurrentWizardStep = 0;
+    ['tfStep0', 'tfStep1', 'tfStep2'].forEach(id => {
+      document.getElementById(id).classList.remove('done', 'active');
+    });
+    document.getElementById('tfStep0').classList.add('active');
+    show('tfWizard0'); hide('tfWizard1'); hide('tfWizard2');
+    hide('tfRefPreview'); hide('tfRefActions');
+    hide('tfMeasPreview'); hide('tfMeasActions');
+  }
+
+  function tfExportCSV() {
+    if (tfResult) {
+      const csv = session.exportTransferFunctionCSV(tfResult, tfRefResult, tfMeasResult);
+      session.downloadCSV(csv, `transfer_function_${fileTimestamp()}.csv`);
+    }
+  }
+
+
+  // ═══════════════════════════════════════════════════════
+  // Tab 2: Discrete Water Filling
+  // ═══════════════════════════════════════════════════════
+
+  let wfSweepSignal = null;
+  let wfStepVolume = 10;
+  let wfTotalSteps = 20;
+  let wfRefRepeat = 5;
+  let wfStepRepeat = 3;
+  let wfCurrentStep = 0;
+  let wfUniformMode = true;
+  let wfVolumeSchedule = [];   // 가변 모드: 스텝별 "추가" 투입량(mL) 목록. 길이 = wfTotalSteps - 1
+
+  // 누적 투입량(mL, step0=0 기준) — 균등/가변 모드 공용
+  function wfCumulativeAt(stepIndex) {
+    if (wfUniformMode) return stepIndex * wfStepVolume;
+    let sum = 0;
+    for (let i = 0; i < stepIndex && i < wfVolumeSchedule.length; i++) sum += wfVolumeSchedule[i];
+    return sum;
+  }
+
+  // 해당 스텝을 녹음하기 전에 "추가로" 부어야 하는 양(mL) — 안내 문구용
+  function wfIncrementAt(stepIndex) {
+    if (wfUniformMode) return wfStepVolume;
+    return wfVolumeSchedule[stepIndex - 1] || 0;
+  }
+
+  function wfParseVolumeSchedule(text) {
+    return text.split(/[,\s]+/).map(s => parseFloat(s)).filter(v => !isNaN(v) && v > 0);
+  }
+
+  function wfUpdateVolumeScheduleInfo() {
+    const el = document.getElementById('wfVolumeScheduleInfo');
+    if (!el) return;
+    const list = wfParseVolumeSchedule(document.getElementById('wfVolumeSchedule').value);
+    if (list.length === 0) {
+      el.innerHTML = 'Step 0(빈 컵) 다음부터 각 스텝에서 <strong>추가로</strong> 붓는 양입니다. 입력한 개수만큼 스텝이 만들어집니다(빈 컵 스텝 제외).';
+    } else {
+      const cum = list.reduce((a, v) => a + v, 0);
+      el.innerHTML = `총 ${list.length + 1}스텝(빈 컵 포함) · 누적 최대 ${cum}mL — 순서: 0 → ${list.map((v, i) => list.slice(0, i + 1).reduce((a, b) => a + b, 0)).join(' → ')}`;
+    }
+  }
+
+  function wfToggleVolumeMode() {
+    wfUniformMode = document.getElementById('wfUniformMode').checked;
+    if (wfUniformMode) {
+      show('wfUniformFields');
+      hide('wfVariableFields');
+    } else {
+      hide('wfUniformFields');
+      show('wfVariableFields');
+      wfUpdateVolumeScheduleInfo();
+    }
+  }
+
+  function wfStartSession() {
+    wfUniformMode = document.getElementById('wfUniformMode').checked;
+    wfRefRepeat = Math.max(1, parseInt(document.getElementById('wfRefRepeat').value) || 5);
+    wfStepRepeat = Math.max(1, parseInt(document.getElementById('wfStepRepeat').value) || 3);
+    wfCurrentStep = 0;
+
+    if (wfUniformMode) {
+      wfStepVolume = parseInt(document.getElementById('wfStepVolume').value);
+      wfTotalSteps = parseInt(document.getElementById('wfTotalSteps').value);
+      wfVolumeSchedule = [];
+    } else {
+      wfVolumeSchedule = wfParseVolumeSchedule(document.getElementById('wfVolumeSchedule').value);
+      if (wfVolumeSchedule.length === 0) {
+        alert('스텝별 투입량을 최소 1개 이상 입력하세요 (예: 10,30,40,20,50)');
+        return;
+      }
+      wfTotalSteps = wfVolumeSchedule.length + 1;
+      wfStepVolume = wfVolumeSchedule[0]; // 하위호환용 참고값(균등 모드가 아니면 실사용 안 함)
+    }
+
+    session = new SessionManager();
+    session.config = { wfUniformMode, wfStepVolume, wfTotalSteps, wfVolumeSchedule, wfRefRepeat, wfStepRepeat };
+
+    hide('wfSetup');
+    show('wfSession');
+    show('wfRefStep');
+    hide('wfMeasStep');
+    hide('wfResults');
+  }
+
+  // ─── Tab 2 Session Bundle Export/Import ──────────────────
+  async function wfExportBundle() {
+    if (!session.steps || session.steps.length === 0) return;
+    setStatus('세션 번들 생성 중...', '');
+
+    const zip = new JSZip();
+    const refTakes = (session.reference && session.reference.recordings) || [];
+    const refFilenames = refTakes.map((_, i) => `reference_${String(i).padStart(2, '0')}.wav`);
+
+    const steps = session.steps.map((s, i) => {
+      const takes = s.recordings || [s.recording];
+      return {
+        filenames: takes.map((_, k) =>
+          `step_${String(i).padStart(2, '0')}_take${String(k).padStart(2, '0')}_${s.volume_mL}mL.wav`),
+        volume_mL: s.volume_mL
+      };
+    });
+
+    const meta = {
+      version: 2,
+      type: 'water_filling',
+      timestamp: new Date().toISOString(),
+      sampleRate: audio.sampleRate,
+      sweepConfig: getSweepConfig(),
+      analysisConfig: getAnalysisConfig(),
+      volumeMode: wfUniformMode ? 'uniform' : 'variable',
+      stepVolume: wfStepVolume,
+      volumeSchedule: wfUniformMode ? null : wfVolumeSchedule,
+      totalSteps: session.steps.length,
+      refRepeat: refTakes.length,
+      stepRepeat: steps.length ? steps[0].filenames.length : wfStepRepeat,
+      files: {
+        reference: refFilenames,   // 배열(다중 테이크 — 길이 1이면 기존과 동일)
+        steps: steps               // 스텝별 filenames 배열
+      }
+    };
+    zip.file('session.json', JSON.stringify(meta, null, 2));
+
+    // Add reference WAVs (모든 테이크)
+    refTakes.forEach((rec, i) => {
+      zip.file(refFilenames[i], session.exportWAV(rec, audio.sampleRate));
+    });
+
+    // Add step WAVs (모든 테이크)
+    session.steps.forEach((s, i) => {
+      const takes = s.recordings || [s.recording];
+      takes.forEach((rec, k) => {
+        zip.file(steps[i].filenames[k], session.exportWAV(rec, audio.sampleRate));
+      });
+    });
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    session.downloadBlob(content, `wf_session_${fileTimestamp()}.zip`);
+    setStatus('세션 번들 저장 완료', 'active');
+  }
+
+  async function wfImportBundle(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('wfImportStatus');
+    statusEl.textContent = '📦 번들 로드 중...';
+
+    try {
+      if (!audio.audioCtx) await audio.init();
+      const zip = await JSZip.loadAsync(file);
+
+      const metaFile = zip.file('session.json');
+      if (!metaFile) throw new Error('session.json이 없습니다');
+      const meta = JSON.parse(await metaFile.async('string'));
+
+      // Apply settings
+      applyConfig(meta);
+      if (meta.sampleRate) audio.sampleRate = meta.sampleRate;
+      if (meta.stepVolume) document.getElementById('wfStepVolume').value = meta.stepVolume;
+      if (meta.totalSteps) document.getElementById('wfTotalSteps').value = meta.totalSteps;
+      if (meta.refRepeat) document.getElementById('wfRefRepeat').value = meta.refRepeat;
+      if (meta.stepRepeat) document.getElementById('wfStepRepeat').value = meta.stepRepeat;
+
+      wfUniformMode = meta.volumeMode !== 'variable';
+      wfVolumeSchedule = (!wfUniformMode && Array.isArray(meta.volumeSchedule)) ? meta.volumeSchedule : [];
+      document.getElementById('wfUniformMode').checked = wfUniformMode;
+      if (!wfUniformMode) document.getElementById('wfVolumeSchedule').value = wfVolumeSchedule.join(',');
+      wfToggleVolumeMode();
+
+      wfStepVolume = meta.stepVolume || parseInt(document.getElementById('wfStepVolume').value);
+      wfTotalSteps = meta.files.steps.length;
+      wfRefRepeat = meta.refRepeat || 1;
+      wfStepRepeat = meta.stepRepeat || 1;
+      session = new SessionManager();
+
+      // Generate sweep from saved config
+      const cfg = meta.sweepConfig || getSweepConfig();
+      wfSweepSignal = DSP.generateLogSweep(cfg.f1, cfg.f2, cfg.duration, audio.sampleRate, cfg.volume || 0.5);
+
+      // Decode reference WAV(s) — 구버전(문자열 1개)·신버전(배열 여러 테이크) 모두 지원
+      statusEl.textContent = '📦 레퍼런스 디코딩...';
+      const refFiles = Array.isArray(meta.files.reference) ? meta.files.reference : [meta.files.reference];
+      const refBufs = [];
+      for (const fn of refFiles) {
+        const refData = await zip.file(fn).async('arraybuffer');
+        const refDecoded = await audio.audioCtx.decodeAudioData(refData);
+        refBufs.push(refDecoded.getChannelData(0));
+      }
+      session.setReference(wfSweepSignal, refBufs, audio.sampleRate);
+
+      // Decode and process each step (구버전 filename 1개·신버전 filenames 배열 모두 지원)
+      for (let i = 0; i < meta.files.steps.length; i++) {
+        const stepInfo = meta.files.steps[i];
+        statusEl.textContent = `📦 스텝 ${i + 1}/${meta.files.steps.length} 디코딩...`;
+        const filenames = stepInfo.filenames || [stepInfo.filename];
+        const stepBufs = [];
+        for (const fn of filenames) {
+          const stepData = await zip.file(fn).async('arraybuffer');
+          const stepDecoded = await audio.audioCtx.decodeAudioData(stepData);
+          stepBufs.push(stepDecoded.getChannelData(0));
+        }
+        session.addStep(stepInfo.volume_mL, stepBufs);
+      }
+
+      // Show results
+      hide('wfSetup');
+      show('wfSession');
+      hide('wfRefStep');
+      hide('wfMeasStep');
+      wfShowResults();
+      statusEl.textContent = `✅ ${meta.files.steps.length}스텝 분석 완료! (${meta.timestamp || ''})`;
+    } catch (err) {
+      statusEl.textContent = `❌ 번들 로드 실패: ${err.message}`;
+    }
+    e.target.value = '';
+  }
+
+  async function wfRecordReference() {
+    const cfg = getSweepConfig();
+    wfSweepSignal = DSP.generateLogSweep(cfg.f1, cfg.f2, cfg.duration, audio.sampleRate, cfg.volume);
+
+    const btn = document.getElementById('wfRefRecordBtn');
+    btn.disabled = true;
+    document.getElementById('wfRefRedoBtn').disabled = true;
+    document.getElementById('wfRefNextBtn').disabled = true;
+
+    try {
+      const recordings = [];
+      for (let i = 0; i < wfRefRepeat; i++) {
+        const label = wfRefRepeat > 1 ? ` (${i + 1}/${wfRefRepeat})` : '';
+        btn.textContent = `🔄 녹음 중...${label}`;
+        setStatus(`레퍼런스 스윕 녹음 중...${label}`, 'recording');
+        recordings.push(await audio.playAndRecord(wfSweepSignal));
+      }
+      session.setReference(wfSweepSignal, recordings, audio.sampleRate);
+
+      // Mark record as done
+      btn.disabled = true;
+      btn.textContent = wfRefRepeat > 1 ? `✅ 녹음 완료 (${wfRefRepeat}회 중앙값)` : '✅ 녹음 완료';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+
+      // Enable redo and next
+      document.getElementById('wfRefRedoBtn').disabled = false;
+      document.getElementById('wfRefNextBtn').disabled = false;
+
+      setStatus('레퍼런스 완료', 'active');
+    } catch (e) {
+      alert('녹음 실패: ' + e.message);
+      btn.disabled = false; btn.textContent = '▶ 레퍼런스 녹음';
+    }
+  }
+
+  function wfGoToMeasure() {
+    hide('wfRefStep');
+    show('wfMeasStep');
+    wfCurrentStep = 0;
+    wfUpdateStepUI();
+  }
+
+  function wfUpdateStepUI() {
+    const vol = wfCumulativeAt(wfCurrentStep);
+    const pct = ((wfCurrentStep + 1) / wfTotalSteps * 100).toFixed(0);
+    document.getElementById('wfProgressFill').style.width = pct + '%';
+
+    let stepLabel, text;
+    if (wfCurrentStep === 0) {
+      stepLabel = `Step 0 (빈컵)`;
+      text = `빈 컵을 놓고 녹음하세요`;
+    } else {
+      stepLabel = `Step ${wfCurrentStep} (누적: ${vol}mL)`;
+      text = `${wfIncrementAt(wfCurrentStep)}mL를 추가한 후 녹음하세요`;
+    }
+    document.getElementById('wfStepInfo').textContent = `${stepLabel} — ${wfCurrentStep + 1}/${wfTotalSteps}`;
+    document.getElementById('wfMeasText').textContent = `${stepLabel}: ${text}`;
+
+    // Reset record button to ready state
+    const btn = document.getElementById('wfMeasRecordBtn');
+    btn.disabled = false;
+    btn.textContent = '▶ 이 스텝 녹음';
+    btn.classList.remove('btn-secondary');
+    btn.classList.add('btn-primary');
+
+    // Disable action buttons
+    document.getElementById('wfMeasRedoBtn').disabled = true;
+    document.getElementById('wfMeasNextBtn').disabled = true;
+    hide('wfStepPreview');
+    hide('wfStepFormants');
+  }
+
+  async function wfRecordStep() {
+    const btn = document.getElementById('wfMeasRecordBtn');
+    btn.disabled = true;
+    document.getElementById('wfMeasRedoBtn').disabled = true;
+    document.getElementById('wfMeasNextBtn').disabled = true;
+    const vol = wfCumulativeAt(wfCurrentStep);
+    const stepLabel = wfCurrentStep === 0 ? 'Step 0 (빈컵)' : `Step ${wfCurrentStep} (누적: ${vol}mL)`;
+
+    try {
+      const recordings = [];
+      for (let i = 0; i < wfStepRepeat; i++) {
+        const label = wfStepRepeat > 1 ? ` (${i + 1}/${wfStepRepeat})` : '';
+        btn.textContent = `🔄 녹음 중...${label}`;
+        setStatus(`${stepLabel} 녹음 중...${label}`, 'recording');
+        recordings.push(await audio.playAndRecord(wfSweepSignal));
+      }
+      const step = session.addStep(vol, recordings);
+
+      // Show preview
+      show('wfStepPreview');
+      document.getElementById('wfStepPreviewTitle').textContent = `전달함수 — ${stepLabel}`;
+      Viz.drawTransferFunction(document.getElementById('wfStepCanvas'), step.deconvResult, {
+        maxFreq: 8000, minDb: -40, maxDb: 40, formants: step.formants
+      });
+
+      show('wfStepFormants');
+      Viz.showFormants('wfStepFormantDisplay', step.formants);
+
+      // Disable record button, mark as done
+      btn.disabled = true;
+      btn.textContent = wfStepRepeat > 1 ? `✅ 녹음 완료 (${wfStepRepeat}회 중앙값)` : '✅ 녹음 완료';
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+
+      // Enable action buttons
+      document.getElementById('wfMeasRedoBtn').disabled = false;
+      if (wfCurrentStep >= wfTotalSteps - 1) {
+        document.getElementById('wfMeasNextBtn').disabled = true;
+      } else {
+        document.getElementById('wfMeasNextBtn').disabled = false;
+      }
+
+      setStatus(`${stepLabel} 완료`, 'active');
+    } catch (e) {
+      alert('녹음 실패: ' + e.message);
+      btn.disabled = false; btn.textContent = '▶ 이 스텝 녹음';
+    }
+  }
+
+  function wfNextStep() {
+    wfCurrentStep++;
+    if (wfCurrentStep >= wfTotalSteps) {
+      wfShowResults();
+    } else {
+      wfUpdateStepUI();
+    }
+  }
+
+  function wfShowResults() {
+    hide('wfMeasStep');
+    show('wfResults');
+
+    const results = session.steps.map(s => s.deconvResult);
+    const labels = session.steps.map(s => `${s.volume_mL}mL`);
+    const formants = session.steps.map(s => s.formants);
+
+    Viz.drawWaterfall(document.getElementById('wfWaterfallCanvas'), results, labels, { maxFreq: 8000 });
+    wfA0SetStatus('세션 시작 시 녹음한 것 그대로 (아직 교체 안 함)');
+    wfA0RefreshPreview();
+
+    // Draw spectrogram-style heatmap with formant overlay
+    requestAnimationFrame(() => {
+      wfDrawSpectrogramTracking(
+        document.getElementById('wfTrackingCanvas'),
+        results, formants, labels, { maxFreq: 6000 }
+      );
+    });
+
+    // Build step browser buttons
+    const container = document.getElementById('wfStepBrowserBtns');
+    container.innerHTML = '';
+    session.steps.forEach((step, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-secondary btn-sm';
+      btn.style.cssText = 'font-size:0.7rem; padding:2px 8px; min-width:50px;';
+      btn.textContent = `${step.volume_mL}mL`;
+      btn.addEventListener('click', () => wfBrowseStep(i));
+      container.appendChild(btn);
+    });
+
+    // WAV download for browsed step
+    document.getElementById('wfBrowseWavBtn').onclick = () => {
+      if (wfBrowsedStepIdx !== null && session.steps[wfBrowsedStepIdx]) {
+        const s = session.steps[wfBrowsedStepIdx];
+        const blob = session.exportWAV(s.recording, audio.sampleRate);
+        session.downloadBlob(blob, `step_${s.volume_mL}mL_${fileTimestamp()}.wav`);
+      }
+    };
+
+    document.getElementById('wfBrowseTfCsvBtn').onclick = () => {
+      if (wfBrowsedStepIdx !== null && session.steps[wfBrowsedStepIdx]) {
+        const s = session.steps[wfBrowsedStepIdx];
+        if (!s.deconvResult) return;
+        const r = s.deconvResult;
+        const maxBin = Math.round(8000 / r.sampleRate * r.N);
+        let csv = 'freq_Hz,magnitude_dB,phase_rad\n';
+        for (let i = 0; i < maxBin; i++) {
+          csv += `${r.freqs[i].toFixed(1)},${r.magDb[i].toFixed(4)},${r.phase[i].toFixed(6)}\n`;
+        }
+        session.downloadCSV(csv, `step_${s.volume_mL}mL_tf_${fileTimestamp()}.csv`);
+      }
+    };
+
+    document.getElementById('wfBrowseFormantCsvBtn').onclick = () => {
+      if (wfBrowsedStepIdx !== null && session.steps[wfBrowsedStepIdx]) {
+        const s = session.steps[wfBrowsedStepIdx];
+        if (!s.formants || s.formants.length === 0) return;
+        let csv = 'formant,frequency_Hz,bandwidth_Hz,magnitude_dB\n';
+        s.formants.forEach((f, i) => {
+          csv += `F${i + 1},${f.freq},${f.bw},${(f.mag || 0).toFixed(2)}\n`;
+        });
+        session.downloadCSV(csv, `step_${s.volume_mL}mL_formants_${fileTimestamp()}.csv`);
+      }
+    };
+
+    document.getElementById('exportSessionBtn').disabled = false;
+    setStatus(`이산 물채움 완료 — ${session.steps.length}스텝`, 'active');
+  }
+
+  let wfBrowsedStepIdx = null;
+
+  function wfBrowseStep(idx) {
+    wfBrowsedStepIdx = idx;
+    const step = session.steps[idx];
+    if (!step) return;
+
+    show('wfStepBrowserContent');
+    document.getElementById('wfBrowseTitle').textContent =
+      `Step ${idx + 1} — ${step.volume_mL} mL`;
+
+    // Highlight active button
+    const btns = document.getElementById('wfStepBrowserBtns').children;
+    for (let i = 0; i < btns.length; i++) {
+      btns[i].style.background = i === idx ? 'var(--accent-blue)' : '';
+      btns[i].style.color = i === idx ? '#fff' : '';
+    }
+
+    // Draw waveform
+    requestAnimationFrame(() => {
+      Viz.drawWaveform(document.getElementById('wfBrowseWaveCanvas'), step.recording);
+      Viz.drawTransferFunction(document.getElementById('wfBrowseTfCanvas'), step.deconvResult, {
+        maxFreq: 8000, minDb: -40, maxDb: 40, formants: step.formants
+      });
+    });
+
+    Viz.showFormants('wfBrowseFormantDisplay', step.formants);
+  }
+
+  // Spectrogram-style heatmap of transfer functions + formant tracking overlay
+  function wfDrawSpectrogramTracking(canvas, results, allFormants, labels, opts = {}) {
+    const { ctx, w, h } = Viz.getCanvas(canvas);
+    ctx.fillStyle = '#010409';
+    ctx.fillRect(0, 0, w, h);
+    if (!results || results.length === 0) return;
+
+    const maxFreq = opts.maxFreq || 6000;
+    const margin = { top: 10, bottom: 30, left: 50, right: 60 };
+    const plotW = w - margin.left - margin.right;
+    const plotH = h - margin.top - margin.bottom;
+    const N = results.length;
+
+    // Find global dB range across all transfer functions
+    let globalMin = Infinity, globalMax = -Infinity;
+    const slices = []; // precompute frequency slices
+    for (let i = 0; i < N; i++) {
+      const r = results[i];
+      if (!r) { slices.push(null); continue; }
+      const maxBin = Math.min(r.magDb.length, Math.round(maxFreq / r.sampleRate * r.N));
+      const slice = r.magDb.slice(0, maxBin);
+      slices.push({ data: slice, maxBin, sr: r.sampleRate, fftN: r.N });
+      for (let j = 1; j < maxBin; j++) {
+        if (isFinite(slice[j])) {
+          if (slice[j] < globalMin) globalMin = slice[j];
+          if (slice[j] > globalMax) globalMax = slice[j];
+        }
+      }
+    }
+    if (!isFinite(globalMin)) globalMin = -60;
+    if (!isFinite(globalMax)) globalMax = 20;
+    // Add small padding
+    const dbRange = globalMax - globalMin || 1;
+    const minDb = globalMin - dbRange * 0.05;
+    const maxDb = globalMax + dbRange * 0.05;
+
+    // Draw heatmap using pixel manipulation for speed
+    const dpr = window.devicePixelRatio || 1;
+    const pixW = Math.round(plotW * dpr);
+    const pixH = Math.round(plotH * dpr);
+    const imgData = ctx.createImageData(pixW, pixH);
+    const idata = imgData.data;
+
+    for (let px = 0; px < pixW; px++) {
+      const stepIdx = Math.floor(px / pixW * N);
+      const s = slices[Math.min(stepIdx, N - 1)];
+      if (!s) {
+        for (let py = 0; py < pixH; py++) {
+          const idx = (py * pixW + px) * 4;
+          idata[idx] = 1; idata[idx+1] = 4; idata[idx+2] = 9; idata[idx+3] = 255;
+        }
+        continue;
+      }
+      for (let py = 0; py < pixH; py++) {
+        const freq = (1 - py / pixH) * maxFreq;
+        const bin = Math.round(freq / (s.sr / 2) * (s.maxBin - 1));
+        const clampedBin = Math.max(0, Math.min(s.data.length - 1, bin));
+        const db = s.data[clampedBin];
+        const norm = Math.max(0, Math.min(1, (db - minDb) / (maxDb - minDb)));
+
+        // Viridis-like colormap
+        let r, g, b;
+        if (norm < 0.25) {
+          const t = norm / 0.25;
+          r = 68 + t * (33 - 68); g = 1 + t * (144 - 1); b = 84 + t * (140 - 84);
+        } else if (norm < 0.5) {
+          const t = (norm - 0.25) / 0.25;
+          r = 33 + t * (53 - 33); g = 144 + t * (183 - 144); b = 140 + t * (121 - 140);
+        } else if (norm < 0.75) {
+          const t = (norm - 0.5) / 0.25;
+          r = 53 + t * (187 - 53); g = 183 + t * (207 - 183); b = 121 + t * (48 - 121);
+        } else {
+          const t = (norm - 0.75) / 0.25;
+          r = 187 + t * (253 - 187); g = 207 + t * (231 - 207); b = 48 + t * (37 - 48);
+        }
+
+        const idx = (py * pixW + px) * 4;
+        idata[idx] = r; idata[idx+1] = g; idata[idx+2] = b; idata[idx+3] = 255;
+      }
+    }
+
+    // Put heatmap image
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.putImageData(imgData, Math.round(margin.left * dpr), Math.round(margin.top * dpr));
+    ctx.restore();
+
+    // Y-axis labels (frequency)
+    ctx.fillStyle = '#484f58';
+    ctx.font = '10px Consolas, monospace';
+    const freqLabels = [200, 500, 1000, 2000, 3000, 4000, 5000, 6000];
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 0.5;
+    for (const f of freqLabels) {
+      if (f > maxFreq) break;
+      const y = margin.top + (1 - f / maxFreq) * plotH;
+      ctx.fillText(f >= 1000 ? `${f/1000}k` : f, margin.left - 35, y + 4);
+      ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(margin.left + plotW, y); ctx.stroke();
+    }
+
+    // X-axis labels (water level)
+    if (labels) {
+      const step = Math.max(1, Math.floor(N / 10));
+      for (let i = 0; i < N; i += step) {
+        const x = margin.left + ((i + 0.5) / N) * plotW;
+        ctx.fillStyle = '#484f58';
+        ctx.fillText(labels[i], x - 12, h - margin.bottom + 14);
+      }
+      // Always show last label
+      if (N > 1) {
+        const x = margin.left + ((N - 0.5) / N) * plotW;
+        ctx.fillStyle = '#484f58';
+        ctx.fillText(labels[N - 1], x - 12, h - margin.bottom + 14);
+      }
+    }
+
+    // Axis titles
+    ctx.fillStyle = '#484f58';
+    ctx.font = '11px sans-serif';
+    ctx.save();
+    ctx.translate(12, margin.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Hz', 0, 0);
+    ctx.restore();
+
+    // Colorbar
+    const cbW = 14, cbX = w - margin.right + 12;
+    const cbTop = margin.top, cbH = plotH;
+    for (let py = 0; py < cbH; py++) {
+      const norm = 1 - py / cbH;
+      let r, g, b;
+      if (norm < 0.25) {
+        const t = norm / 0.25;
+        r = 68 + t * (33 - 68); g = 1 + t * (144 - 1); b = 84 + t * (140 - 84);
+      } else if (norm < 0.5) {
+        const t = (norm - 0.25) / 0.25;
+        r = 33 + t * (53 - 33); g = 144 + t * (183 - 144); b = 140 + t * (121 - 140);
+      } else if (norm < 0.75) {
+        const t = (norm - 0.5) / 0.25;
+        r = 53 + t * (187 - 53); g = 183 + t * (207 - 183); b = 121 + t * (48 - 121);
+      } else {
+        const t = (norm - 0.75) / 0.25;
+        r = 187 + t * (253 - 187); g = 207 + t * (231 - 207); b = 48 + t * (37 - 48);
+      }
+      ctx.fillStyle = `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+      ctx.fillRect(cbX, cbTop + py, cbW, 1);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(cbX, cbTop, cbW, cbH);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '9px Consolas';
+    ctx.textAlign = 'left';
+    const cbLabelX = cbX + cbW + 4;
+    for (let i = 0; i <= 4; i++) {
+      const dbVal = maxDb - (i / 4) * (maxDb - minDb);
+      ctx.fillText(`${Math.round(dbVal)}`, cbLabelX, cbTop + (i / 4) * cbH + 3);
+    }
+    ctx.textAlign = 'start';
+
+    // ── Formant tracking overlay ──
+    if (!allFormants || allFormants.length === 0) return;
+    const maxFormants = Math.min(7, Math.max(...allFormants.map(f => f.length)));
+    const colors = Viz.COLORS.formantColors;
+
+    // Draw connecting lines
+    for (let fi = 0; fi < maxFormants; fi++) {
+      ctx.strokeStyle = colors[fi % colors.length];
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i < N; i++) {
+        if (fi >= allFormants[i].length) continue;
+        const freq = allFormants[i][fi].freq;
+        if (freq <= 0 || freq > maxFreq) continue;
+        const x = margin.left + ((i + 0.5) / N) * plotW;
+        const y = margin.top + (1 - freq / maxFreq) * plotH;
+        if (!started) { ctx.moveTo(x, y); started = true; }
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Draw dots with labels
+    for (let i = 0; i < N; i++) {
+      const x = margin.left + ((i + 0.5) / N) * plotW;
+      for (let fi = 0; fi < Math.min(allFormants[i].length, maxFormants); fi++) {
+        const freq = allFormants[i][fi].freq;
+        if (freq <= 0 || freq > maxFreq) continue;
+        const y = margin.top + (1 - freq / maxFreq) * plotH;
+        // White outline
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+        // Colored center
+        ctx.fillStyle = colors[fi % colors.length];
+        ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    // Formant labels on the right edge
+    const lastIdx = N - 1;
+    if (allFormants[lastIdx]) {
+      for (let fi = 0; fi < Math.min(allFormants[lastIdx].length, maxFormants); fi++) {
+        const freq = allFormants[lastIdx][fi].freq;
+        if (freq <= 0 || freq > maxFreq) continue;
+        const y = margin.top + (1 - freq / maxFreq) * plotH;
+        ctx.fillStyle = colors[fi % colors.length];
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(`F${fi + 1}`, margin.left + plotW + 4, y + 4);
+      }
+    }
+  }
+
+  function wfReset() {
+    session = new SessionManager();
+    wfCurrentStep = 0;
+    show('wfSetup');
+    hide('wfSession');
+    hide('wfResults');
+    show('wfRefStep');
+    hide('wfRefActions');
+  }
+
+  // wfToggleVolumeMode()는 초기 렌더 시점(스크립트 로드 직후)엔 아직 DOM 리스너 등록 전이라
+  // 페이지 로드 시 한 번 호출해 표시 상태를 동기화한다.
+  document.addEventListener('DOMContentLoaded', () => {
+    const cb = document.getElementById('wfUniformMode');
+    if (cb) { wfUniformMode = cb.checked; }
+  });
+
+  function wfExportAll() {
+    const csv = session.exportFormantTrackingCSV();
+    session.downloadCSV(csv, `water_filling_formants_${fileTimestamp()}.csv`);
+  }
+
+  // ─── app.py(v2 파이프라인)용 내보내기 ─────────────────────
+  // 스텝TF / 레퍼런스TF 비율 → 50~7000Hz 700점 재샘플 → log10|H|
+  // v2/config.py 의 FREQ_MIN/FREQ_MAX/N_FREQ 그리드와 일치해야 함
+  function wfSampleDbAt(freqs, magDb, f) {
+    // freqs는 등간격 FFT bin — 선형 보간
+    const df = freqs[1] - freqs[0];
+    const idx = f / df;
+    const i0 = Math.floor(idx);
+    if (i0 < 0) return magDb[0];
+    if (i0 >= magDb.length - 1) return magDb[magDb.length - 1];
+    const t = idx - i0;
+    return magDb[i0] * (1 - t) + magDb[i0 + 1] * t;
+  }
+
+  function wfExportV2(labelSuffix) {
+    if (!session.steps || session.steps.length === 0) return;
+    if (!session.reference || !session.reference.recording) {
+      alert('레퍼런스 녹음이 없습니다. 컵 없이 레퍼런스를 먼저 녹음하세요.');
+      return;
+    }
+    setStatus('app.py용 스펙트럼 생성 중...', '');
+
+    // 레퍼런스(컵 없음)도 스텝과 동일하게 스윕 디컨볼루션 → 비율의 분모
+    // (다중 테이크로 녹음했으면 setReference에서 이미 중앙값 결합해 둔 것을 사용.
+    //  A0 실험으로 레퍼런스를 교체했다면 session.reference가 그 새 레퍼런스를 가리키므로
+    //  여기서 다시 계산할 때 자동으로 반영된다 — 스텝 쪽 deconvResult는 손대지 않는다.)
+    const refDeconv = session.reference.combined || DSP.deconvolve(
+      session.reference.recording, session.reference.sweep, session.reference.sampleRate);
+
+    const F_MIN = 50, F_MAX = 7000, N_FREQ = 700;  // = v2/config.py
+    const spectra = session.steps.map(s => {
+      const row = new Array(N_FREQ);
+      for (let k = 0; k < N_FREQ; k++) {
+        const f = F_MIN + (F_MAX - F_MIN) * k / (N_FREQ - 1);
+        // 비율 전달함수: 컵있음/컵없음 → dB 뺄셈, log10|H| = dB/20
+        const db = wfSampleDbAt(s.deconvResult.freqs, s.deconvResult.magDb, f)
+                 - wfSampleDbAt(refDeconv.freqs, refDeconv.magDb, f);
+        row[k] = Math.round(db / 20 * 1e5) / 1e5;
+      }
+      return row;
+    });
+
+    const data = {
+      version: 1,
+      type: 'v2_infer_spectra',
+      timestamp: new Date().toISOString(),
+      sampleRate: audio.sampleRate,
+      sweepConfig: getSweepConfig(),
+      freq_min: F_MIN, freq_max: F_MAX, n_freq: N_FREQ,
+      step_volume_mL: wfUniformMode ? wfStepVolume : null,
+      volume_schedule_mL: wfUniformMode ? null : wfVolumeSchedule,
+      v_cum_m3: session.steps.map(s => s.volume_mL * 1e-6),
+      spectra_log10: spectra
+    };
+    const suffix = labelSuffix ? `_${labelSuffix}` : '';
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    session.downloadBlob(blob, `v2_infer${suffix}_${fileTimestamp()}.json`);
+    setStatus('app.py용 JSON 저장 완료 — v2/app.py 추론 탭에 업로드하세요', 'active');
+  }
+
+  // ─── A0 레퍼런스 교체 실험 ───────────────────────────────
+  // 이미 녹음해 둔 스텝(session.steps)은 그대로 두고, session.reference만 바꿔가며
+  // (① 새로 녹음 ② WAV 불러오기) 비율을 다시 계산·내보낼 수 있게 한다.
+  // 스텝의 deconvResult는 항상 이 세션의 wfSweepSignal로 디컨볼브된 고정값이므로
+  // 레퍼런스를 몇 번을 바꿔도 다시 계산할 필요가 없다 — wfExportV2()가 그때그때의
+  // session.reference로 분모만 새로 계산해 뺄셈한다.
+  function wfA0SetStatus(msg) {
+    const el = document.getElementById('wfA0Status');
+    if (el) el.textContent = `현재 레퍼런스: ${msg}`;
+  }
+
+  function wfA0SanitizedLabel() {
+    const raw = document.getElementById('wfA0Label').value.trim();
+    return (raw ? raw : 'cond').replace(/[\\/:*?"<>|\s]+/g, '_');
+  }
+
+  async function wfA0RecordReference() {
+    if (!session.reference) { alert('먼저 세션을 시작하고 스텝을 기록하세요.'); return; }
+    const repeat = Math.max(1, parseInt(document.getElementById('wfA0RefRepeat').value) || 1);
+    const btn = document.getElementById('wfA0RecordRefBtn');
+    btn.disabled = true;
+    try {
+      const recordings = [];
+      for (let i = 0; i < repeat; i++) {
+        const label = repeat > 1 ? ` (${i + 1}/${repeat})` : '';
+        btn.textContent = `🔄 녹음 중...${label}`;
+        setStatus(`A0 레퍼런스 녹음 중...${label}`, 'recording');
+        recordings.push(await audio.playAndRecord(wfSweepSignal));
+      }
+      session.setReference(wfSweepSignal, recordings, audio.sampleRate);
+      wfA0SetStatus(`새로 녹음함 (${repeat}회 중앙값, ${new Date().toLocaleTimeString()})`);
+      wfA0RefreshPreview();
+      setStatus('A0 레퍼런스 교체 완료', 'active');
+    } catch (e) {
+      alert('녹음 실패: ' + e.message);
+    }
+    btn.disabled = false;
+    btn.textContent = '🎤 새 레퍼런스 녹음';
+  }
+
+  async function wfA0ImportReference(fileList) {
+    if (!session.reference) { alert('먼저 세션을 시작하고 스텝을 기록하세요.'); return; }
+    if (!fileList || fileList.length === 0) return;
+    try {
+      if (!audio.audioCtx) await audio.init();
+      const names = [];
+      const recordings = [];
+      for (const file of fileList) {
+        const buf = await file.arrayBuffer();
+        const decoded = await audio.audioCtx.decodeAudioData(buf);
+        recordings.push(decoded.getChannelData(0));
+        names.push(file.name);
+      }
+      // 불러온 WAV는 이 세션의 스윕(wfSweepSignal)으로 디컨볼브된다 —
+      // 같은 스윕 설정으로 녹음된 파일이어야 정확하다(UI 안내 문구 참고).
+      session.setReference(wfSweepSignal, recordings, audio.sampleRate);
+      wfA0SetStatus(`WAV ${recordings.length}개 불러옴 — ${names.join(', ')}`);
+      wfA0RefreshPreview();
+      setStatus('A0 레퍼런스 교체 완료 (WAV 불러오기)', 'active');
+    } catch (e) {
+      alert('불러오기 실패: ' + e.message);
+    }
+  }
+
+  function wfA0RefreshPreview() {
+    const canvas = document.getElementById('wfA0PreviewCanvas');
+    if (!canvas || !session.steps.length || !session.reference) return;
+    const refDeconv = session.reference.combined || DSP.deconvolve(
+      session.reference.recording, session.reference.sweep, session.reference.sampleRate);
+    const lastStep = session.steps[session.steps.length - 1];
+    const freqs = lastStep.deconvResult.freqs;
+    const N = freqs.length;
+    const ratioMagDb = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      ratioMagDb[i] = lastStep.deconvResult.magDb[i] - wfSampleDbAt(refDeconv.freqs, refDeconv.magDb, freqs[i]);
+    }
+    const ratioResult = {
+      freqs, magDb: ratioMagDb, phase: new Float64Array(N),
+      N: lastStep.deconvResult.N, sampleRate: lastStep.deconvResult.sampleRate
+    };
+    requestAnimationFrame(() => {
+      Viz.drawTransferFunction(canvas, ratioResult, { maxFreq: 7000, minDb: -40, maxDb: 20 });
+    });
+  }
+
+  function wfA0ExportRatio() {
+    wfExportV2(wfA0SanitizedLabel());
+  }
+
+  // 재현성(MAD) 분석용 — 결합(중앙값)하지 않은, 테이크 하나하나의 원본 스펙트럼을
+  // 개별 JSON으로 zip에 담아 내보낸다. 레퍼런스 테이크는 session.reference.sweep으로,
+  // 스텝 테이크는 실제로 그 스텝을 녹음할 때 쓰인 wfSweepSignal로 디컨볼브한다
+  // (레퍼런스를 교체해도 스텝이 녹음될 당시의 스윕은 항상 wfSweepSignal이었다).
+  async function wfA0ExportRawTakes() {
+    if (!session.reference || !session.reference.recordings) { alert('레퍼런스가 없습니다.'); return; }
+    if (!session.steps.length) { alert('스텝이 없습니다.'); return; }
+    setStatus('개별 테이크 원본 스펙트럼 생성 중...', '');
+
+    const label = wfA0SanitizedLabel();
+    const F_MIN = 50, F_MAX = 7000, N_FREQ = 700;
+    const grid = Array.from({ length: N_FREQ }, (_, k) => F_MIN + (F_MAX - F_MIN) * k / (N_FREQ - 1));
+
+    function toRawJson(deconvResult, role, stepIndex, take) {
+      const magDb = grid.map(f => Math.round(wfSampleDbAt(deconvResult.freqs, deconvResult.magDb, f) * 1e4) / 1e4);
+      return JSON.stringify({
+        version: 1, type: 'raw_spectrum_take',
+        role, condition: label, stepIndex: stepIndex === null ? null : stepIndex,
+        volume_mL: stepIndex === null ? null : session.steps[stepIndex].volume_mL,
+        take,
+        timestamp: new Date().toISOString(),
+        sampleRate: deconvResult.sampleRate,
+        sweepConfig: getSweepConfig(),
+        freq_min: F_MIN, freq_max: F_MAX, n_freq: N_FREQ,
+        magDb
+      });
+    }
+
+    const zip = new JSZip();
+
+    session.reference.recordings.forEach((rec, k) => {
+      const d = DSP.deconvolve(rec, session.reference.sweep, session.reference.sampleRate);
+      zip.file(`ref_${label}_${k + 1}.json`, toRawJson(d, 'reference', null, k + 1));
+    });
+
+    session.steps.forEach((s, i) => {
+      const takes = s.recordings || [s.recording];
+      takes.forEach((rec, k) => {
+        const d = DSP.deconvolve(rec, wfSweepSignal, audio.sampleRate);
+        zip.file(`step${i}_${label}_${k + 1}.json`, toRawJson(d, 'step', i, k + 1));
+      });
+    });
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    session.downloadBlob(content, `a0_raw_${label}_${fileTimestamp()}.zip`);
+    setStatus('개별 테이크 원본 스펙트럼 저장 완료', 'active');
+  }
+
+  return { init };
+})();
+
+
+// ═══════════════════════════════════════════════════════════════════
+// 6. Bootstrap
+// ═══════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  App.init().catch(err => {
+    console.error('초기화 실패:', err);
+  });
+});
+</script>
+</body>
+</html>

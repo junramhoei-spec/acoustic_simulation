@@ -1,0 +1,26 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large Datasets (>50MB) and Executables
+dataset/v2/*.npz
+dataset/spectrum_data/
+*.exe
+*.zip
+dist/
+build/
+backups/
+
+# Environments and OS generated
+.venv/
+env/
+venv/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.gemini/
+
+# Office temp locks
+~$*.docx

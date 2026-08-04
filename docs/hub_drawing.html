@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>허브 플레이트 레이저 커팅 도면 - ø358mm & ø361.3mm (5T 적층형)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fa;
+    color: #222;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  h1 { font-size: 20px; color: #111; margin-bottom: 5px; }
+  .sub { font-size: 13px; color: #666; }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  @media(min-width: 1000px) {
+    .drawings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+  }
+  
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .card h2 {
+    font-size: 15px;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #0066cc;
+    padding-bottom: 5px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  svg {
+    border: 1px solid #eee;
+    background: #fafafa;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Dimension Line Styles */
+  .dl { stroke: #c00; stroke-width: 0.8; }
+  .de { stroke: #c00; stroke-width: 0.5; stroke-dasharray: 2,2; }
+  .dt { fill: #c00; font-size: 10px; font-weight: bold; text-anchor: middle; }
+  
+  /* Feature Annotations */
+  .feat-text { fill: #0066cc; font-size: 9px; font-weight: bold; }
+  .center-line { stroke: #999; stroke-width: 0.4; stroke-dasharray: 10,4,2,4; }
+  
+  .info-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .info-section h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: #111;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 12px;
+    text-align: left;
+  }
+  th {
+    background: #f4f6f8;
+    font-weight: bold;
+    color: #333;
+    width: 250px;
+  }
+  
+  .btn-group {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    background: #0066cc;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #0052a3; }
+  .btn-dxf { background: #28a745; }
+  .btn-dxf:hover { background: #218838; }
+  
+  .badge {
+    background: #e1f0ff;
+    color: #0066cc;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .badge-warn {
+    background: #fff3cd;
+    color: #856404;
+  }
+  
+  .alert {
+    background: #e2f0d9;
+    border-left: 4px solid #385723;
+    color: #385723;
+    padding: 15px;
+    font-size: 13px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+  .alert ul {
+    margin-left: 20px;
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>허브 플레이트 (Hub Plate) 레이저 커팅 가공 도면</h1>
+  <p class="sub">아크릴 5T × 3장 적층형 (상단/중단/하단 허브용) | 단위: mm</p>
+</header>
+
+<div class="container">
+  
+  <div class="alert">
+    <strong>📐 허브별 적층 조합 안내:</strong><br>
+    3D CAD 설계 분석 결과, 각 허브별로 5T 아크릴 3장을 적층하여 15T로 구성하는 세부 규격은 다음과 같습니다.
+    <ul>
+      <li><strong>상단 허브 (Upper Hub):</strong> <strong>도면 A(ø100.5) 2장</strong> + <strong>도면 B(ø110.2) 1장</strong> (하단에 배치하여 파이프가 얹히는 소켓 형성)</li>
+      <li><strong>중단 허브 (Middle Hub):</strong> <strong>도면 B(ø110.2) 2장</strong> + <strong>도면 C(ø361.3) 1장</strong> (파이프가 완전히 관통해야 하며, 1장은 풀리 벨트 이탈 방지용 림)</li>
+      <li><strong>하단 허브 (Lower Hub):</strong> <strong>도면 A(ø100.5) 2장</strong> + <strong>도면 B(ø110.2) 1장</strong> (상단에 배치하여 파이프가 꽂히는 소켓 형성)</li>
+    </ul>
+    <strong>총 필요한 아크릴 레이저 커팅 수량:</strong> 도면 A = 4장, 도면 B = 4장, 도면 C = 1장 (보스 제외)
+  </div>
+
+  <div class="drawings-grid">
+    
+    <!-- 도면 A 카드 -->
+    <div class="card">
+      <span class="badge">도면 A (총 4장 제작)</span>
+      <h2>허브 디스크 - 관통층 (ø100.5)</h2>
+      
+      <svg width="400" height="400" viewBox="-40 -40 440 440">
+        <defs>
+          <marker id="arrow" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6 Z" fill="#c00"/></marker>
+          <marker id="arrow-rev" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c00"/></marker>
+        </defs>
+        
+        <!-- 중심 가이드선 -->
+        <line x1="-20" y1="180" x2="380" y2="180" class="center-line" />
+        <line x1="180" y1="-20" x2="180" y2="380" class="center-line" />
+        <circle cx="180" cy="180" r="120" stroke="#aaa" stroke-width="0.5" stroke-dasharray="4,4" fill="none" />
+        <text x="180" y="55" fill="#666" font-size="8" text-anchor="middle">PCD ø240</text>
+
+        <!-- [CUT] 외경 ø358 -->
+        <circle cx="180" cy="180" r="179" fill="none" stroke="#222" stroke-width="1.2" />
+        
+        <!-- [CUT] 사각축 20.2 x 20.2 -->
+        <rect x="169.9" y="169.9" width="20.2" height="20.2" fill="none" stroke="#222" stroke-width="1" />
+        
+        <!-- [CUT] 6x ø100.5 구멍 -->
+        <circle cx="300.0" cy="180.0" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="283.9" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="283.9" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="60.0" cy="180.0" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="76.1" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="76.1" r="50.25" fill="none" stroke="#222" stroke-width="1" />
+
+        <!-- 치수선: 외경 ø358 -->
+        <line x1="180" y1="359" x2="180" y2="385" class="de" />
+        <line x1="359" y1="180" x2="385" y2="180" class="de" />
+        <line x1="180" y1="375" x2="359" y2="375" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="270" y="371" class="dt">R179 (ø358)</text>
+
+        <!-- 치수선: 사각홀 20.2 -->
+        <line x1="169.9" y1="169.9" x2="169.9" y2="145" class="de" />
+        <line x1="190.1" y1="169.9" x2="190.1" y2="145" class="de" />
+        <line x1="169.9" y1="150" x2="190.1" y2="150" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="180" y="142" class="dt">20.2</text>
+
+        <!-- 치수선: 6x ø100.5 -->
+        <line x1="300" y1="180" x2="300" y2="129.75" class="de" />
+        <line x1="300" y1="150" x2="270" y2="150" class="dl" />
+        <text x="260" y="153" class="feat-text" text-anchor="end">6x ø100.5</text>
+      </svg>
+      
+      <div class="btn-group">
+        <a href="hub_layer_100_5.svg" class="btn" download>SVG 다운로드</a>
+        <a href="hub_layer_100_5.dxf" class="btn btn-dxf" download>DXF 다운로드</a>
+      </div>
+    </div>
+
+    <!-- 도면 B 카드 -->
+    <div class="card">
+      <span class="badge">도면 B (총 4장 제작)</span>
+      <h2>허브 디스크 - 소켓/관통층 (ø110.2)</h2>
+      
+      <svg width="400" height="400" viewBox="-40 -40 440 440">
+        <!-- 중심 가이드선 -->
+        <line x1="-20" y1="180" x2="380" y2="180" class="center-line" />
+        <line x1="180" y1="-20" x2="180" y2="380" class="center-line" />
+        <circle cx="180" cy="180" r="120" stroke="#aaa" stroke-width="0.5" stroke-dasharray="4,4" fill="none" />
+        <text x="180" y="55" fill="#666" font-size="8" text-anchor="middle">PCD ø240</text>
+
+        <!-- [CUT] 외경 ø358 -->
+        <circle cx="180" cy="180" r="179" fill="none" stroke="#222" stroke-width="1.2" />
+        
+        <!-- [CUT] 사각축 20.2 x 20.2 -->
+        <rect x="169.9" y="169.9" width="20.2" height="20.2" fill="none" stroke="#222" stroke-width="1" />
+        
+        <!-- [CUT] 6x ø110.2 구멍 -->
+        <circle cx="300.0" cy="180.0" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="283.9" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="283.9" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="60.0" cy="180.0" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="76.1" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="76.1" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+
+        <!-- 치수선: 외경 ø358 -->
+        <line x1="180" y1="359" x2="180" y2="385" class="de" />
+        <line x1="359" y1="180" x2="385" y2="180" class="de" />
+        <line x1="180" y1="375" x2="359" y2="375" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="270" y="371" class="dt">R179 (ø358)</text>
+
+        <!-- 치수선: 사각홀 20.2 -->
+        <line x1="169.9" y1="169.9" x2="169.9" y2="145" class="de" />
+        <line x1="190.1" y1="169.9" x2="190.1" y2="145" class="de" />
+        <line x1="169.9" y1="150" x2="190.1" y2="150" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="180" y="142" class="dt">20.2</text>
+
+        <!-- 치수선: 6x ø110.2 -->
+        <line x1="300" y1="180" x2="300" y2="124.9" class="de" />
+        <line x1="300" y1="150" x2="270" y2="150" class="dl" />
+        <text x="260" y="153" class="feat-text" text-anchor="end">6x ø110.2</text>
+      </svg>
+      
+      <div class="btn-group">
+        <a href="hub_layer_110_2.svg" class="btn" download>SVG 다운로드</a>
+        <a href="hub_layer_110_2.dxf" class="btn btn-dxf" download>DXF 다운로드</a>
+      </div>
+    </div>
+
+    <!-- 도면 C 카드 -->
+    <div class="card">
+      <span class="badge badge-warn">도면 C (총 1장 제작)</span>
+      <h2>중단 허브 - 벨트 가이드 림 (ø361.3)</h2>
+      
+      <svg width="400" height="400" viewBox="-40 -40 440 440">
+        <!-- 중심 가이드선 -->
+        <line x1="-20" y1="180" x2="380" y2="180" class="center-line" />
+        <line x1="180" y1="-20" x2="180" y2="380" class="center-line" />
+        <circle cx="180" cy="180" r="120" stroke="#aaa" stroke-width="0.5" stroke-dasharray="4,4" fill="none" />
+        <text x="180" y="55" fill="#666" font-size="8" text-anchor="middle">PCD ø240</text>
+
+        <!-- [CUT] 외경 ø361.3 -->
+        <circle cx="180" cy="180" r="180.65" fill="none" stroke="#222" stroke-width="1.2" />
+        
+        <!-- [CUT] 사각축 20.2 x 20.2 -->
+        <rect x="169.9" y="169.9" width="20.2" height="20.2" fill="none" stroke="#222" stroke-width="1" />
+        
+        <!-- [CUT] 6x ø110.2 구멍 -->
+        <circle cx="300.0" cy="180.0" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="283.9" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="283.9" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="60.0" cy="180.0" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="120.0" cy="76.1" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+        <circle cx="240.0" cy="76.1" r="55.1" fill="none" stroke="#222" stroke-width="1" />
+
+        <!-- 치수선: 외경 ø361.3 -->
+        <line x1="180" y1="360.65" x2="180" y2="390" class="de" />
+        <line x1="360.65" y1="180" x2="390" y2="180" class="de" />
+        <line x1="180" y1="380" x2="360.65" y2="380" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="270" y="376" class="dt">R180.65 (ø361.3)</text>
+
+        <!-- 치수선: 사각홀 20.2 -->
+        <line x1="169.9" y1="169.9" x2="169.9" y2="145" class="de" />
+        <line x1="190.1" y1="169.9" x2="190.1" y2="145" class="de" />
+        <line x1="169.9" y1="150" x2="190.1" y2="150" class="dl" marker-start="url(#arrow)" marker-end="url(#arrow-rev)" />
+        <text x="180" y="142" class="dt">20.2</text>
+
+        <!-- 치수선: 6x ø110.2 -->
+        <line x1="300" y1="180" x2="300" y2="124.9" class="de" />
+        <line x1="300" y1="150" x2="270" y2="150" class="dl" />
+        <text x="260" y="153" class="feat-text" text-anchor="end">6x ø110.2</text>
+      </svg>
+      
+      <div class="btn-group">
+        <a href="hub_middle_rim_110_2.svg" class="btn" download>SVG 다운로드</a>
+        <a href="hub_middle_rim_110_2.dxf" class="btn btn-dxf" download>DXF 다운로드</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="info-section">
+    <h3>⚙️ 가공 사양 및 세부 매칭 테이블</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>허브 종류</th>
+          <th>레이저 커팅 아크릴 적층 구성</th>
+          <th>조립 후 최종 형상</th>
+          <th>기능 및 역할</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>상단 허브<br>(Upper Hub)</th>
+          <td>
+            - <strong>도면 A (ø100.5) × 2장</strong><br>
+            - <strong>도면 B (ø110.2) × 1장</strong>
+          </td>
+          <td>총 15mm 두께, 하면에 5mm 깊이의 ø110.2 소켓 구멍 확보</td>
+          <td>상부에서 6개의 아크릴 파이프 기둥을 덮어서 고정 및 정렬하는 역할</td>
+        </tr>
+        <tr>
+          <th>중단 허브<br>(Middle Hub)</th>
+          <td>
+            - <strong>도면 B (ø110.2) × 2장</strong> (외경 ø358)<br>
+            - <strong>도면 C (ø110.2) × 1장</strong> (외경 ø361.3)
+          </td>
+          <td>총 15mm 두께, 6개 홀 전체가 ø110.2로 완전히 관통하며 외경 한 층이 벨트 가이드 역할</td>
+          <td>6개의 아크릴 파이프가 중앙을 관통하며, 풀리 구동벨트가 탈조되는 것을 막아주는 가이드 림 포함</td>
+        </tr>
+        <tr>
+          <th>하단 허브<br>(Lower Hub)</th>
+          <td>
+            - <strong>도면 A (ø100.5) × 2장</strong><br>
+            - <strong>도면 B (ø110.2) × 1장</strong>
+          </td>
+          <td>총 15mm 두께, 상면에 5mm 깊이의 ø110.2 소켓 구멍 확보</td>
+          <td>하부에서 6개의 아크릴 파이프 기둥을 안착시키고, 지컵(CUP) 링이 통과하여 낙하할 수 있는 관통부 제공</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>🛠️ 아크릴 레이저 커팅 주문 수량 요약</h3>
+    <ul>
+      <li><strong>도면 A (ø358 OD / ø100.5 Hole / 20.2 SQ):</strong> 총 <strong>4장</strong></li>
+      <li><strong>도면 B (ø358 OD / ø110.2 Hole / 20.2 SQ):</strong> 총 <strong>4장</strong></li>
+      <li><strong>도면 C (ø361.3 OD / ø110.2 Hole / 20.2 SQ):</strong> 총 <strong>1장</strong></li>
+    </ul>
+    <p style="margin-top: 10px; font-size: 12px; color: #555;">※ 중앙 사각축 결합 홀(20.2mm)은 3가지 도면에 모두 관통되어 있어 축을 쉽게 통과시킬 수 있습니다.</p>
+  </div>
+
+</div>
+
+<footer style="text-align:center;font-size:11px;color:#888;margin-top:20px;padding:20px 0;">
+  생성일: 2026-06-22 | OpenSCAD 모델 매개변수 동기화 완료 | Ctrl+P를 눌러 PDF로 저장하거나 인쇄할 수 있습니다.
+</footer>
+
+</body>
+</html>

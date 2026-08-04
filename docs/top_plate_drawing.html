@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>베이스 플레이트 (상판) 가공 도면 - 410×420×15mm</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR',sans-serif;background:#fff;color:#222;padding:10px}
+  h1{font-size:17px;text-align:center;margin-bottom:2px}
+  .sub{font-size:11px;text-align:center;color:#555;margin-bottom:10px}
+  svg text{font-family:'Noto Sans KR',sans-serif}
+  .dl{stroke:#c00;stroke-width:0.6}
+  .de{stroke:#c00;stroke-width:0.4;stroke-dasharray:3,3}
+  .dt{fill:#c00;font-size:13px;font-weight:700;text-anchor:middle}
+  .lb{font-size:11px;fill:#333;text-anchor:middle}
+  .feat{font-size:10px;fill:#06c;text-anchor:middle}
+  .featb{font-size:10px;fill:#06c;text-anchor:middle;font-weight:700}
+  .note{font-size:10px;fill:#888;text-anchor:middle}
+  td,th{border:1px solid #aaa;padding:3px 8px;font-size:11px}
+  table{border-collapse:collapse;margin:8px auto}
+</style>
+</head>
+<body>
+<h1>베이스 플레이트 (상판 / Upper Fixed Base Plate) 가공 도면</h1>
+<p class="sub">15T 통판 | 410 × 420mm (Y=0 대칭) | 단위: mm | 평면도(위에서 본 XY)</p>
+
+<div style="text-align:center">
+<svg width="785" height="790" viewBox="-80 -50 615 620">
+<defs>
+  <marker id="a1" markerWidth="7" markerHeight="7" refX="0" refY="3.5" orient="auto"><path d="M7,0 L0,3.5 L7,7" fill="#c00"/></marker>
+  <marker id="a2" markerWidth="7" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#c00"/></marker>
+</defs>
+
+<!-- 좌표계: SVG_x = plate_local_x (좌→우), SVG_y = 420 - plate_local_y (전방=하단, 후방=상단) -->
+<!-- 컵(월드 Y=0) = plate_local_y 210 = 판 높이 420의 정중앙 → Y 대칭 -->
+
+<!-- ===== 상판 외형 (기둥 회피홈 30×30 ×4모서리) ===== -->
+<path d="
+  M 30,420
+  L 380,420
+  L 380,390
+  L 410,390
+  L 410,30
+  L 380,30
+  L 380,0
+  L 30,0
+  L 30,30
+  L 0,30
+  L 0,390
+  L 30,390
+  Z"
+  fill="#f2f2f2" stroke="#333" stroke-width="1.2"/>
+
+<!-- 기둥 위치 표시 (점선) -->
+<rect x="0" y="390" width="30" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,3"/>
+<rect x="380" y="390" width="30" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,3"/>
+<rect x="0" y="0" width="30" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,3"/>
+<rect x="380" y="0" width="30" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,3"/>
+<text class="note" x="15" y="409" font-size="7">기둥</text>
+<text class="note" x="395" y="409" font-size="7">기둥</text>
+<text class="note" x="15" y="19" font-size="7">기둥</text>
+<text class="note" x="395" y="19" font-size="7">기둥</text>
+
+<!-- 중심선 (Y=0 대칭축) -->
+<line x1="-15" y1="210" x2="500" y2="210" stroke="#aaa" stroke-width="0.5" stroke-dasharray="14,4,3,4"/>
+<text class="note" x="-22" y="213" font-size="9" fill="#aaa">CL</text>
+
+<!-- ===== 컵 개구부 (원형 + 우측 개방), 적재축 DROP_X=local 325 ===== -->
+<!-- 원형 center SVG(325,210) = local(325,210), r=55.5 / 슬롯 우측 개방 -->
+<path d="
+  M 325,265.5
+  L 410,265.5
+  L 410,154.5
+  L 325,154.5
+  A 55.5,55.5 0 1,0 325,265.5
+  Z"
+  fill="#fff" stroke="#333" stroke-width="1"/>
+<!-- 컵 중심 마크 -->
+<line x1="310" y1="210" x2="340" y2="210" stroke="#06c" stroke-width="0.4" stroke-dasharray="7,2,2,2"/>
+<line x1="325" y1="195" x2="325" y2="225" stroke="#06c" stroke-width="0.4" stroke-dasharray="7,2,2,2"/>
+<circle cx="325" cy="210" r="2" fill="#06c"/>
+<text class="featb" x="300" y="120">컵 개구부</text>
+<text class="feat" x="300" y="133">⌀111 (우측 개방)</text>
+
+<!-- ===== 보스 블라인드홀 (⌀36, 깊이 10) — 판 중심 정렬 ===== -->
+<!-- center local(205,210) = SVG(205,210) = 판 정중심 (※리볼버 축 -120과 5mm 차이) -->
+<circle cx="205" cy="210" r="18" fill="#eaf3ff" stroke="#888" stroke-width="0.8" stroke-dasharray="5,3"/>
+<line x1="195" y1="210" x2="215" y2="210" stroke="#888" stroke-width="0.35" stroke-dasharray="4,2,2,2"/>
+<line x1="205" y1="200" x2="205" y2="220" stroke="#888" stroke-width="0.35" stroke-dasharray="4,2,2,2"/>
+<circle cx="205" cy="210" r="2" fill="#888"/>
+<text class="featb" x="150" y="170" fill="#06c">⌀36 보스홀</text>
+<text class="feat" x="150" y="183">깊이 10 (블라인드)</text>
+<line x1="170" y1="180" x2="193" y2="203" stroke="#888" stroke-width="0.4"/>
+
+<!-- ===== 모터 브래킷 체결홀 (⌀4.5 × 4, X 2열) ===== -->
+<!-- local X 40·55 / Y 42·67 → SVG (40,378)(40,353)(55,378)(55,353) -->
+<circle cx="40" cy="378" r="2.25" fill="none" stroke="#333" stroke-width="0.9"/>
+<circle cx="40" cy="353" r="2.25" fill="none" stroke="#333" stroke-width="0.9"/>
+<circle cx="55" cy="378" r="2.25" fill="none" stroke="#333" stroke-width="0.9"/>
+<circle cx="55" cy="353" r="2.25" fill="none" stroke="#333" stroke-width="0.9"/>
+<line x1="35" y1="378" x2="60" y2="378" stroke="#06c" stroke-width="0.3"/>
+<line x1="35" y1="353" x2="60" y2="353" stroke="#06c" stroke-width="0.3"/>
+<line x1="40" y1="348" x2="40" y2="383" stroke="#06c" stroke-width="0.3"/>
+<line x1="55" y1="348" x2="55" y2="383" stroke="#06c" stroke-width="0.3"/>
+<text class="featb" x="103" y="360" fill="#06c">⌀4.5 ×4</text>
+<text class="feat" x="103" y="373">모터 체결 (X 2열)</text>
+
+<!-- 방향 라벨 -->
+<text class="lb" x="-35" y="420">전방(F)</text>
+<text class="lb" x="-35" y="12">후방(B)</text>
+
+<!-- ============================================================ -->
+<!--  치수선 — 하단 X치수 (좌측 모서리 기준, 단계별 간격)            -->
+<!-- ============================================================ -->
+<line class="de" x1="0"    y1="420" x2="0"    y2="530"/>
+<line class="de" x1="40"   y1="383" x2="40"   y2="455"/>
+<line class="de" x1="55"   y1="383" x2="55"   y2="470"/>
+<line class="de" x1="205"  y1="228" x2="205"  y2="485"/>
+<line class="de" x1="325"  y1="265.5" x2="325" y2="500"/>
+<line class="de" x1="380"  y1="390" x2="380"  y2="440"/>
+<line class="de" x1="410"  y1="390" x2="410"  y2="530"/>
+
+<!-- 좌단→모터홀 2열 (40 안쪽, 55 바깥쪽으로 정렬) -->
+<line class="dl" x1="0" y1="450" x2="40" y2="450" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="20" y="446" font-size="11">40</text>
+<line class="dl" x1="0" y1="465" x2="55" y2="465" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="27" y="461">55</text>
+<!-- 기둥홈 30 (우측 기둥으로 이동 — 일관성) -->
+<line class="dl" x1="380" y1="435" x2="410" y2="435" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="395" y="431" font-size="11">30</text>
+<!-- 좌단→보스 205 (판 중심) -->
+<line class="dl" x1="0" y1="480" x2="205" y2="480" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="102" y="476">205</text>
+<!-- 좌단→컵중심 325 (적재축 DROP_X) -->
+<line class="dl" x1="0" y1="495" x2="325" y2="495" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="162" y="491">325</text>
+<!-- 전체 410 -->
+<line class="dl" x1="0" y1="525" x2="410" y2="525" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="205" y="521">410</text>
+
+<!-- ============================================================ -->
+<!--  치수선 — 우측 Y치수 (전방 모서리 기준, 단계별 간격)            -->
+<!-- ============================================================ -->
+<line class="de" x1="410" y1="420" x2="500" y2="420"/>
+<line class="de" x1="410" y1="390" x2="430" y2="390"/>
+<line class="de" x1="410" y1="265.5" x2="470" y2="265.5"/>
+<line class="de" x1="410" y1="210"   x2="485" y2="210"/>
+<line class="de" x1="410" y1="154.5" x2="470" y2="154.5"/>
+<line class="de" x1="410" y1="0"   x2="500" y2="0"/>
+
+<!-- 전방 기둥홈 30 -->
+<line class="dl" x1="425" y1="420" x2="425" y2="390" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="425" y="409" transform="rotate(90,425,409)" font-size="11">30</text>
+<!-- 컵 개구부 높이 111 -->
+<line class="dl" x1="463" y1="265.5" x2="463" y2="154.5" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="463" y="214" transform="rotate(90,463,214)">111</text>
+<!-- 전방→컵중심 210 (= 판 정중앙) -->
+<line class="dl" x1="478" y1="420" x2="478" y2="210" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="478" y="318" transform="rotate(90,478,318)">210</text>
+<!-- 전체 420 -->
+<line class="dl" x1="495" y1="420" x2="495" y2="0" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="495" y="213" transform="rotate(90,495,213)">420</text>
+
+<!-- ============================================================ -->
+<!--  치수선 — 좌측 모터홀 Y치수                                    -->
+<!-- ============================================================ -->
+<line class="de" x1="40" y1="378" x2="-40" y2="378"/>
+<line class="de" x1="40" y1="353" x2="-40" y2="353"/>
+<line class="de" x1="0"  y1="420" x2="-40" y2="420"/>
+<!-- 전방→첫 홀 42 -->
+<line class="dl" x1="-18" y1="420" x2="-18" y2="378" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-18" y="401" transform="rotate(-90,-18,401)" font-size="11">42</text>
+<!-- 홀 간격(피치) 25 -->
+<line class="dl" x1="-35" y1="378" x2="-35" y2="353" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-35" y="367" transform="rotate(-90,-35,367)" font-size="11">25</text>
+
+</svg>
+</div>
+
+<table>
+<tr><th>항목</th><th>사양</th></tr>
+<tr><td>외형 치수</td><td>410 × 420 × 15mm — Y=0 대칭 (기둥 회피홈 30×30, 4모서리)</td></tr>
+<tr><td>컵 개구부</td><td>⌀111 원형 + 우측 슬롯 개방, 좌단 325 / 전방 210 (Y중심) — 적재축</td></tr>
+<tr><td>보스홀</td><td>⌀36, 깊이 10mm 블라인드 (비관통 단가공) — 좌단 205 = 판 중심 = 리볼버 축</td></tr>
+<tr><td>모터 체결홀</td><td>⌀4.5 관통 × 4 (좌단 X 2열 = 40·55, Y피치 25 / 모터 좌측이동 대비 2열)</td></tr>
+</table>
+
+<p style="text-align:center;font-size:10px;color:#888;margin-top:6px">생성일: 2026-06-20 | 평면도 1면 (평판 부품) | 메인파일(anti_3030) 동기화 | Ctrl+P → PDF 저장</p>
+</body>
+</html>

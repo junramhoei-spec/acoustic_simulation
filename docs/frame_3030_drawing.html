@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>3030 프레임 조립 도면 v5 - 600×420×700mm (3각법)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR',sans-serif;background:#fff;color:#222;padding:10px}
+  h1{text-align:center;font-size:15px;margin-bottom:2px}
+  .sub{text-align:center;font-size:11px;color:#555;margin-bottom:8px}
+  svg text{font-family:'Noto Sans KR',sans-serif}
+  .col{fill:#c0c0c0;stroke:#444;stroke-width:1}
+  .bv{fill:#d0d0d0;stroke:#444;stroke-width:0.8}
+  .br{fill:#ffe8b0;stroke:#c80;stroke-width:0.8}
+  .brh{fill:none;stroke:#c80;stroke-width:0.8;stroke-dasharray:6,4}
+  .bm{fill:#c8e8c8;stroke:#080;stroke-width:0.8}
+  .ba{fill:#b0d8ff;stroke:#06c;stroke-width:0.8}
+  .bah{fill:none;stroke:#06c;stroke-width:0.8;stroke-dasharray:6,4}
+  .dl{stroke:#c00;stroke-width:0.6}
+  .de{stroke:#c00;stroke-width:0.4;stroke-dasharray:3,3}
+  .dt{fill:#c00;font-size:20px;text-anchor:middle;font-weight:700}
+  .lb{fill:#333;font-size:10px;text-anchor:middle}
+  .lg{font-size:9px;fill:#555}
+  .vl{font-size:13px;font-weight:700;fill:#333;text-anchor:middle}
+  td,th{border:1px solid #aaa;padding:2px 6px}
+  @media print{body{padding:5mm}}
+</style>
+</head>
+<body>
+<h1>3030 알루미늄 프로파일 프레임 조립 도면 (3각법)</h1>
+<p class="sub">외곽 600×420×700mm | 3030 프로파일 | Y=0 대칭 | 단위:mm | 26본</p>
+
+<div style="text-align:center">
+<svg width="950" height="900" viewBox="-100 -60 1220 1310">
+<defs>
+  <marker id="a1" markerWidth="6" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M6,0 L0,3 L6,6" fill="#c00"/></marker>
+  <marker id="a2" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#c00"/></marker>
+</defs>
+
+<!-- ============================================================ -->
+<!--  평면도 (TOP VIEW): x=0..600, y=0..420                       -->
+<!-- ============================================================ -->
+<text class="vl" x="300" y="-35">평면도 (상부에서 본 XY)</text>
+
+<!-- 평면도 X치수 (상단) -->
+<line class="de" x1="0" y1="0" x2="0" y2="-22"/>
+<line class="de" x1="225" y1="0" x2="225" y2="-22"/>
+<line class="de" x1="380" y1="0" x2="380" y2="-22"/>
+<line class="dl" x1="0" y1="-15" x2="225" y2="-15" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="112" y="-18">225</text>
+<line class="dl" x1="225" y1="-15" x2="380" y2="-15" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="302" y="-18">155</text>
+
+<!-- 하부 점선 -->
+<rect x="30" y="0" width="540" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,4"/>
+<rect x="30" y="390" width="540" height="30" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,4"/>
+<rect x="0" y="30" width="30" height="360" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,4"/>
+<rect x="380" y="30" width="30" height="360" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,4"/>
+<rect x="570" y="30" width="30" height="360" fill="none" stroke="#999" stroke-width="0.6" stroke-dasharray="4,4"/>
+
+<!-- 레일 (주황) -->
+<rect class="br" x="0" y="110" width="600" height="30" opacity="0.7"/>
+<rect class="br" x="0" y="280" width="600" height="30" opacity="0.7"/>
+<text fill="#c80" font-size="10" font-weight="700" x="300" y="129" text-anchor="middle">레일X① Z=158</text>
+<text fill="#c80" font-size="10" font-weight="700" x="300" y="299" text-anchor="middle">레일X② Z=158</text>
+
+<!-- 중부 (녹색) -->
+<rect x="225" y="30" width="30" height="360" fill="#c8e8c8" stroke="#080" stroke-width="0.8" opacity="0.6"/>
+<text fill="#080" font-size="8" x="240" y="210" transform="rotate(90,240,210)">중부Y X=225</text>
+
+<!-- 상부 (회색) -->
+<rect class="bv" x="30" y="0" width="540" height="30"/>
+<rect class="bv" x="30" y="390" width="540" height="30"/>
+<rect class="bv" x="0" y="30" width="30" height="360"/>
+<rect class="bv" x="380" y="30" width="30" height="360"/>
+<rect class="bv" x="570" y="30" width="30" height="360"/>
+<!-- 축보/측정보 -->
+<rect class="ba" x="30" y="195" width="350" height="30"/>
+<text fill="#06c" font-size="10" font-weight="700" x="205" y="214" text-anchor="middle">축보 Z=670</text>
+<rect class="ba" x="410" y="195" width="160" height="30"/>
+<text fill="#06c" font-size="9" font-weight="700" x="490" y="214" text-anchor="middle">측정보</text>
+
+<!-- 기둥 -->
+<rect class="col" x="0" y="0" width="30" height="30"/>
+<rect class="col" x="0" y="390" width="30" height="30"/>
+<rect class="col" x="380" y="0" width="30" height="30"/>
+<rect class="col" x="380" y="390" width="30" height="30"/>
+<rect class="col" x="570" y="0" width="30" height="30"/>
+<rect class="col" x="570" y="390" width="30" height="30"/>
+
+<!-- CL -->
+<line x1="-15" y1="210" x2="610" y2="210" stroke="#aaa" stroke-width="0.5" stroke-dasharray="12,5,3,5"/>
+
+<!-- 평면도 Y치수 (우측) -->
+<line class="de" x1="600" y1="0" x2="680" y2="0"/>
+<line class="de" x1="600" y1="110" x2="660" y2="110"/>
+<line class="de" x1="600" y1="210" x2="640" y2="210"/>
+<line class="de" x1="600" y1="280" x2="660" y2="280"/>
+<line class="de" x1="600" y1="420" x2="680" y2="420"/>
+<line class="dl" x1="650" y1="0" x2="650" y2="110" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="650" y="58" transform="rotate(90,650,58)">110</text>
+<line class="dl" x1="650" y1="110" x2="650" y2="210" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="650" y="163" transform="rotate(90,650,163)">100</text>
+<line class="dl" x1="650" y1="210" x2="650" y2="280" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="650" y="248" transform="rotate(90,650,248)">70</text>
+<line class="dl" x1="650" y1="280" x2="650" y2="420" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="650" y="353" transform="rotate(90,650,353)">140</text>
+<line class="dl" x1="675" y1="0" x2="675" y2="420" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="695" y="215" transform="rotate(90,695,215)">420</text>
+
+<!-- 라벨 -->
+<text class="lb" x="-20" y="15">전방(F)</text>
+<text class="lb" x="-20" y="410">후방(B)</text>
+
+
+<!-- ============================================================ -->
+<!--  정면도 (FRONT VIEW): x=0..600, y=460..1160                  -->
+<!--  SVG_y = 460 + (700 - Z_ref)                                 -->
+<!-- ============================================================ -->
+<text class="vl" x="300" y="448">정면도 (전방에서 본 XZ)</text>
+
+<!-- 레일X보 (Z=158, y=972) — 실선 -->
+<rect class="br" x="0" y="972" width="600" height="30"/>
+<text class="lg" x="610" y="990" fill="#c80">레일X ×2</text>
+
+<!-- 축보/측정보 숨은선 (Z=670, y=460+0=460) -->
+<rect class="bah" x="30" y="460" width="350" height="30"/>
+<rect class="bah" x="410" y="460" width="160" height="30"/>
+
+<!-- 하부X보 (Z=0, y=1130) -->
+<rect class="bv" x="30" y="1130" width="540" height="30"/>
+<text class="lg" x="350" y="1148">하부X ×2</text>
+
+<!-- 중부X보 (Z=435, y=460+265=725, h=30 위로) -->
+<rect class="bm" x="30" y="695" width="350" height="30"/>
+<text class="lg" x="210" y="713" fill="#080">중부X ×2</text>
+
+<!-- 상부X보 (Z=670, y=460+0=460) -->
+<rect class="bv" x="30" y="460" width="540" height="30"/>
+<text class="lg" x="480" y="478">상부X ×2</text>
+
+<!-- 기둥 -->
+<rect class="col" x="0" y="460" width="30" height="700"/>
+<rect class="col" x="380" y="460" width="30" height="700"/>
+<rect class="col" x="570" y="460" width="30" height="700"/>
+
+<!-- 정면도 X치수 -->
+<line class="de" x1="0" y1="1160" x2="0" y2="1200"/>
+<line class="de" x1="380" y1="1160" x2="380" y2="1200"/>
+<line class="de" x1="570" y1="1160" x2="570" y2="1200"/>
+<line class="de" x1="600" y1="1160" x2="600" y2="1200"/>
+<line class="dl" x1="0" y1="1185" x2="380" y2="1185" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="190" y="1180">380</text>
+<line class="dl" x1="380" y1="1185" x2="570" y2="1185" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="475" y="1180">190</text>
+<line class="dl" x1="0" y1="1210" x2="600" y2="1210" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="300" y="1230">600</text>
+
+<!-- 정면도 Z치수 (좌측) -->
+<line class="de" x1="0" y1="1160" x2="-55" y2="1160"/>
+<line class="de" x1="0" y1="972" x2="-25" y2="972"/>
+<line class="de" x1="0" y1="695" x2="-40" y2="695"/>
+<line class="de" x1="0" y1="460" x2="-60" y2="460"/>
+<!-- 바닥→레일 -->
+<line class="dl" x1="-15" y1="1160" x2="-15" y2="972" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-15" y="1070" transform="rotate(-90,-15,1070)">158</text>
+<!-- 바닥→중부 상면 -->
+<line class="dl" x1="-35" y1="1160" x2="-35" y2="695" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-35" y="930" transform="rotate(-90,-35,930)">465</text>
+<!-- 전체 -->
+<line class="dl" x1="-55" y1="1160" x2="-55" y2="460" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-75" y="815" transform="rotate(-90,-75,815)">700</text>
+
+<!-- 기둥 라벨 -->
+<text class="lb" x="15" y="455">좌(L)</text>
+<text class="lb" x="395" y="455">중(M)</text>
+<text class="lb" x="585" y="455">우(R)</text>
+
+<!-- ============================================================ -->
+<!--  좌측면도 (SIDE VIEW): x=640..1060, y=460..1160               -->
+<!--  SVG_x = 640 + Y_ref(0..420)                                 -->
+<!-- ============================================================ -->
+<text class="vl" x="850" y="448">좌측면도 (YZ)</text>
+
+<!-- Y보 실선 -->
+<rect class="bv" x="670" y="1130" width="360" height="30"/>
+<rect class="br" x="670" y="972" width="360" height="30"/>
+<!-- 레일X 단면 -->
+<rect class="br" x="750" y="972" width="30" height="30"/>
+<rect class="br" x="920" y="972" width="30" height="30"/>
+<text class="lg" x="745" y="968" fill="#c80">①</text>
+<text class="lg" x="915" y="968" fill="#c80">②</text>
+<rect class="bm" x="670" y="695" width="360" height="30"/>
+<rect class="bv" x="670" y="460" width="360" height="30"/>
+<!-- 축보 단면 -->
+<rect class="ba" x="835" y="460" width="30" height="30"/>
+<text class="lg" x="835" y="455" fill="#06c">축보</text>
+
+<!-- 기둥 -->
+<rect class="col" x="640" y="460" width="30" height="700"/>
+<rect class="col" x="1030" y="460" width="30" height="700"/>
+
+<!-- CL -->
+<line x1="640" y1="850" x2="1060" y2="850" stroke="#aaa" stroke-width="0.5" stroke-dasharray="12,5,3,5"/>
+<text fill="#aaa" font-size="9" x="1065" y="853">CL</text>
+
+<!-- 측면도 치수: 420 -->
+<line class="de" x1="640" y1="1160" x2="640" y2="1200"/>
+<line class="de" x1="1060" y1="1160" x2="1060" y2="1200"/>
+<line class="dl" x1="640" y1="1185" x2="1060" y2="1185" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="850" y="1180">420</text>
+
+<text class="lb" x="655" y="455">전(F)</text>
+<text class="lb" x="1045" y="455">후(B)</text>
+
+<!-- ============================================================ -->
+<!--  투영 가이드선 (정면↔평면, 정면↔측면 정렬 확인)                -->
+<!-- ============================================================ -->
+<!-- 정면도↔평면도 X축 정렬 (좌/중/우 기둥) -->
+<line x1="0" y1="420" x2="0" y2="460" stroke="#ddd" stroke-width="0.4" stroke-dasharray="3,3"/>
+<line x1="600" y1="420" x2="600" y2="460" stroke="#ddd" stroke-width="0.4" stroke-dasharray="3,3"/>
+<!-- 정면도↔측면도 Z축 정렬 -->
+<line x1="600" y1="460" x2="640" y2="460" stroke="#ddd" stroke-width="0.4" stroke-dasharray="3,3"/>
+<line x1="600" y1="1160" x2="640" y2="1160" stroke="#ddd" stroke-width="0.4" stroke-dasharray="3,3"/>
+
+</svg>
+</div>
+
+<p style="text-align:center;font-size:10px;color:#888;margin-top:6px">생성일: 2026-06-19 | 3각법 배치 | Ctrl+P → PDF 저장</p>
+</body>
+</html>

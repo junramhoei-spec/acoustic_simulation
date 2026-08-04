@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>아크릴 원통 가공 도면 - 컵 원통 ×1 + 카트리지 원통 ×6</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Noto Sans KR',sans-serif;background:#fff;color:#222;padding:10px}
+  h1{font-size:17px;text-align:center;margin-bottom:2px}
+  .sub{font-size:11px;text-align:center;color:#555;margin-bottom:10px}
+  svg text{font-family:'Noto Sans KR',sans-serif}
+  .dl{stroke:#c00;stroke-width:0.6}
+  .de{stroke:#c00;stroke-width:0.4;stroke-dasharray:3,3}
+  .dt{fill:#c00;font-size:12px;font-weight:700;text-anchor:middle}
+  .lb{font-size:12px;fill:#222;text-anchor:middle;font-weight:700}
+  .feat{font-size:10px;fill:#06c;text-anchor:middle}
+  .featb{font-size:10px;fill:#06c;text-anchor:middle;font-weight:700}
+  .note{font-size:10px;fill:#888;text-anchor:middle}
+  td,th{border:1px solid #aaa;padding:3px 8px;font-size:11px;text-align:center}
+  table{border-collapse:collapse;margin:8px auto}
+</style>
+</head>
+<body>
+<h1>아크릴 원통 가공 도면</h1>
+<p class="sub">컵 원통 ×1 + 카트리지 원통 ×6 | 모두 OD110 / ID100 동일 규격 | 단면도 | 단위: mm</p>
+
+<div style="text-align:center">
+<svg width="900" height="495" viewBox="-150 -45 500 275">
+<defs>
+  <marker id="a1" markerWidth="7" markerHeight="7" refX="0" refY="3.5" orient="auto"><path d="M7,0 L0,3.5 L7,7" fill="#c00"/></marker>
+  <marker id="a2" markerWidth="7" markerHeight="7" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#c00"/></marker>
+  <pattern id="hatch" width="4" height="4" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+    <line x1="0" y1="0" x2="0" y2="4" stroke="#9ab" stroke-width="0.6"/>
+  </pattern>
+</defs>
+
+<!-- ===================================================================== -->
+<!--  [1] 컵 원통 (단면도) : OD110 ID100 벽5 H180                          -->
+<!--  벽: 좌 x5..10 / 우 x110..115, 보어 x10..110, 상면 y10 하면 y190      -->
+<!-- ===================================================================== -->
+<text class="lb" x="60" y="-22">컵 원통 ×1</text>
+
+<!-- 단면 벽 (해치) -->
+<rect x="5"   y="10" width="5" height="180" fill="url(#hatch)" stroke="#333" stroke-width="1"/>
+<rect x="110" y="10" width="5" height="180" fill="url(#hatch)" stroke="#333" stroke-width="1"/>
+<!-- 중심선 -->
+<line x1="60" y1="2" x2="60" y2="200" stroke="#06c" stroke-width="0.4" stroke-dasharray="8,2,2,2"/>
+
+<!-- 상면 모따기 표시 (모식) + 좌측 콜아웃 -->
+<line x1="5"  y1="10" x2="7"  y2="10" stroke="#c00" stroke-width="1.2"/>
+<line x1="113" y1="10" x2="115" y2="10" stroke="#c00" stroke-width="1.2"/>
+<circle cx="7" cy="10" r="9" fill="none" stroke="#06c" stroke-width="0.6"/>
+<line x1="-46" y1="-6" x2="2" y2="8" stroke="#06c" stroke-width="0.5"/>
+<text class="featb" x="-92" y="-20">상면 내경·외경</text>
+<text class="featb" x="-92" y="-7">모따기 C1 (선반)</text>
+
+<!-- OD 110 (상단) -->
+<line class="de" x1="5"   y1="10" x2="5"   y2="-12"/>
+<line class="de" x1="115" y1="10" x2="115" y2="-12"/>
+<line class="dl" x1="5" y1="-7" x2="115" y2="-7" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="60" y="-10">⌀110</text>
+
+<!-- ID 100 (보어 내부) -->
+<line class="dl" x1="10" y1="35" x2="110" y2="35" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="60" y="32">⌀100</text>
+
+<!-- 벽 t5 인출 -->
+<line x1="7.5" y1="120" x2="-18" y2="120" stroke="#06c" stroke-width="0.5"/>
+<text class="feat" x="-30" y="123">t5</text>
+
+<!-- H 180 (좌측) -->
+<line class="de" x1="5" y1="10"  x2="-45" y2="10"/>
+<line class="de" x1="5" y1="190" x2="-45" y2="190"/>
+<line class="dl" x1="-40" y1="10" x2="-40" y2="190" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="-40" y="100" transform="rotate(-90,-40,100)">180</text>
+
+<text class="note" x="60" y="210">아크릴 파이프 OD110 / ID100</text>
+
+<!-- ===================================================================== -->
+<!--  [2] 카트리지 원통 ×6 (단면도) : OD110 ID100 벽5 H130 (컵과 동일 규격) -->
+<!--  중심 x=230, 벽 좌 x175..180 / 우 x280..285, 보어 180..280, y10..140  -->
+<!-- ===================================================================== -->
+<text class="lb" x="230" y="-22">카트리지 원통 ×6</text>
+
+<rect x="175" y="10" width="5" height="130" fill="url(#hatch)" stroke="#333" stroke-width="1"/>
+<rect x="280" y="10" width="5" height="130" fill="url(#hatch)" stroke="#333" stroke-width="1"/>
+<line x1="230" y1="2" x2="230" y2="150" stroke="#06c" stroke-width="0.4" stroke-dasharray="8,2,2,2"/>
+
+<!-- OD 110 (상단) -->
+<line class="de" x1="175" y1="10" x2="175" y2="-12"/>
+<line class="de" x1="285" y1="10" x2="285" y2="-12"/>
+<line class="dl" x1="175" y1="-7" x2="285" y2="-7" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="230" y="-10">⌀110</text>
+
+<!-- ID 100 (보어 내부) -->
+<line class="dl" x1="180" y1="35" x2="280" y2="35" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="230" y="32">⌀100</text>
+
+<!-- 벽 t5 인출 -->
+<line x1="177.5" y1="100" x2="158" y2="100" stroke="#06c" stroke-width="0.5"/>
+<text class="feat" x="150" y="103">t5</text>
+
+<!-- H 130 (우측) -->
+<line class="de" x1="285" y1="10"  x2="320" y2="10"/>
+<line class="de" x1="285" y1="140" x2="320" y2="140"/>
+<line class="dl" x1="315" y1="10" x2="315" y2="140" marker-start="url(#a1)" marker-end="url(#a2)"/>
+<text class="dt" x="315" y="75" transform="rotate(-90,315,75)">130</text>
+
+<text class="note" x="230" y="170">아크릴 파이프 OD110 / ID100 · 절단 6개</text>
+
+<!-- ===================================================================== -->
+<!--  컵 상면 모따기 디테일 (확대 10×) — 좌측 콜아웃 하단 -->
+<!-- ===================================================================== -->
+<text class="featb" x="-100" y="24" fill="#06c">[상세] 상면 모따기 (확대)</text>
+<g transform="translate(-130,46)">
+  <!-- 확대 단면: 벽 5mm→50px, 모따기 1mm→10px / 좌=외경, 우=내경(보어) -->
+  <path d="M 0,40 L 0,10 L 10,0 L 40,0 L 50,10 L 50,40 Z"
+        fill="url(#hatch)" stroke="#333" stroke-width="1"/>
+  <text class="note" x="5" y="-9" font-size="8" text-anchor="middle">외경</text>
+  <text class="note" x="45" y="-9" font-size="8" text-anchor="middle">내경</text>
+  <line x1="5" y1="2" x2="5" y2="-6" stroke="#c00" stroke-width="0.4"/>
+  <line x1="45" y1="2" x2="45" y2="-6" stroke="#c00" stroke-width="0.4"/>
+  <!-- 모따기 C1 인출 -->
+  <line x1="3" y1="5" x2="-10" y2="13" stroke="#c00" stroke-width="0.4"/>
+  <text class="dt" x="-16" y="17" font-size="9">C1</text>
+  <line x1="47" y1="5" x2="60" y2="13" stroke="#c00" stroke-width="0.4"/>
+  <text class="dt" x="64" y="17" font-size="9">C1</text>
+</g>
+
+</svg>
+</div>
+
+<table>
+<tr><th>부품</th><th>수량</th><th>외경 OD</th><th>내경 ID</th><th>벽두께</th><th>높이</th><th>비고</th></tr>
+<tr><td>컵 원통</td><td>1</td><td>⌀110</td><td>⌀100</td><td>5</td><td>180</td><td>상면 내경·외경 모따기 C1 (선반가공)</td></tr>
+<tr><td>카트리지 원통</td><td>6</td><td>⌀110</td><td>⌀100</td><td>5</td><td>130</td><td>컵과 동일 규격 · 절단만 (모따기 없음)</td></tr>
+</table>
+
+<p style="text-align:center;font-size:10px;color:#888;margin-top:6px">생성일: 2026-06-20 | 아크릴 발주용 | 모따기는 선반가공 (컵 원통 상면만) | 총 길이 180 + 130×6 = 960 ≤ 1m 원관 1개</p>
+</body>
+</html>

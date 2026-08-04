@@ -1,0 +1,222 @@
+[
+  {
+    "idx": 1,
+    "name": "1. 일자형 컵 (높이 105mm, 파란색 링 7개, 반지름 4cm)",
+    "gt_h_mm": 105.0,
+    "pred_h_mm": 103.45613896846771,
+    "err_h_mm": 1.5438610315322843,
+    "err_r_mm": 3.6126262220469396,
+    "vol_pred_ml": 458.81865662522614,
+    "steps": 9,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_01.png"
+  },
+  {
+    "idx": 2,
+    "name": "2. 벌어진 컵 (높이 120mm, 8개: 갈갈초초흰흰검검)",
+    "gt_h_mm": 120.0,
+    "pred_h_mm": 102.43156611919403,
+    "err_h_mm": 17.568433880805966,
+    "err_r_mm": 4.456170084476472,
+    "vol_pred_ml": 246.38543254695833,
+    "steps": 4,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_02.png"
+  },
+  {
+    "idx": 3,
+    "name": "3. 벌어진 컵 (높이 90mm, 6개: 초초검검파파)",
+    "gt_h_mm": 90.0,
+    "pred_h_mm": 102.26025104522705,
+    "err_h_mm": 12.260251045227058,
+    "err_r_mm": 7.132874917560153,
+    "vol_pred_ml": 347.21128758974373,
+    "steps": 5,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_03.png"
+  },
+  {
+    "idx": 4,
+    "name": "4. 오므라드는 컵 (높이 90mm, 6개: 파파검검초초)",
+    "gt_h_mm": 90.0,
+    "pred_h_mm": 113.28983664512634,
+    "err_h_mm": 23.28983664512635,
+    "err_r_mm": 2.450320629702673,
+    "vol_pred_ml": 322.97149300575256,
+    "steps": 7,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_04.png"
+  },
+  {
+    "idx": 5,
+    "name": "5. 오므라드는 컵 (높이 120mm, 8개: 파파파검검검초초)",
+    "gt_h_mm": 120.0,
+    "pred_h_mm": 140.8439803123474,
+    "err_h_mm": 20.84398031234741,
+    "err_r_mm": 4.522540610512098,
+    "vol_pred_ml": 434.34108374640346,
+    "steps": 10,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_05.png"
+  },
+  {
+    "idx": 6,
+    "name": "6. 중앙이 볼록한 컵 (높이 105mm, 7개: 초흰검파검흰초)",
+    "gt_h_mm": 105.0,
+    "pred_h_mm": 98.80518615245819,
+    "err_h_mm": 6.194813847541808,
+    "err_r_mm": 5.198801470561461,
+    "vol_pred_ml": 279.29828502237797,
+    "steps": 6,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_06.png"
+  },
+  {
+    "idx": 7,
+    "name": "7. 중앙이 볼록한 컵 (높이 120mm, 8개: 갈초흰검검흰초갈)",
+    "gt_h_mm": 120.0,
+    "pred_h_mm": 96.04170858860016,
+    "err_h_mm": 23.958291411399838,
+    "err_r_mm": 11.152506939798593,
+    "vol_pred_ml": 227.90285584051162,
+    "steps": 6,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_07.png"
+  },
+  {
+    "idx": 8,
+    "name": "2026-07-23 3D프린터 벌어진 컵 (높이 100mm, 바닥r 15mm, 입구r 35mm)",
+    "gt_h_mm": 100.0,
+    "pred_h_mm": 106.0837459564209,
+    "err_h_mm": 6.083745956420889,
+    "err_r_mm": 8.134349777704479,
+    "vol_pred_ml": 105.1373255904764,
+    "steps": 13,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_08.png"
+  },
+  {
+    "idx": 9,
+    "name": "2026-07-23 유리 벌어진 컵 (높이 144mm, 바닥r 25mm, 입구r 42mm)",
+    "gt_h_mm": 144.0,
+    "pred_h_mm": 160.00752091407776,
+    "err_h_mm": 16.007520914077784,
+    "err_r_mm": 8.686469505898158,
+    "vol_pred_ml": 413.1181922275573,
+    "steps": 40,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_09.png"
+  },
+  {
+    "idx": 10,
+    "name": "2026-07-23 유리 벌어진 컵 (높이 82mm, 바닥r 17mm, 입구r 27mm)",
+    "gt_h_mm": 82.0,
+    "pred_h_mm": 112.08112418651581,
+    "err_h_mm": 30.081124186515805,
+    "err_r_mm": 6.6010224300225575,
+    "vol_pred_ml": 101.0841442621313,
+    "steps": 9,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_10.png"
+  },
+  {
+    "idx": 11,
+    "name": "2026-07-23 3D프린터 일자 컵 (높이 100mm, 반지름 25mm)",
+    "gt_h_mm": 100.0,
+    "pred_h_mm": 147.97725439071658,
+    "err_h_mm": 47.97725439071657,
+    "err_r_mm": 6.454039085656405,
+    "vol_pred_ml": 159.6451475052163,
+    "steps": 15,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_11.png"
+  },
+  {
+    "idx": 12,
+    "name": "2026-07-27 매스실린더 (높이 180mm, 반지름 11mm)",
+    "gt_h_mm": 180.0,
+    "pred_h_mm": 181.3744819164276,
+    "err_h_mm": 1.3744819164276112,
+    "err_r_mm": 0.8232259733809372,
+    "vol_pred_ml": 83.32097058882937,
+    "steps": 7,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_12.png"
+  },
+  {
+    "idx": 13,
+    "name": "2026-07-27 고무 벌어진 컵 (높이 115mm, 바닥r 22mm, 입구r 38mm)",
+    "gt_h_mm": 115.0,
+    "pred_h_mm": 140.89933037757874,
+    "err_h_mm": 25.899330377578732,
+    "err_r_mm": 6.248044468820095,
+    "vol_pred_ml": 408.911524573341,
+    "steps": 28,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_13.png"
+  },
+  {
+    "idx": 14,
+    "name": "2026-07-27 유리 벌어진 컵 (높이 83mm, 바닥r 20mm, 입구r 40mm)",
+    "gt_h_mm": 83.0,
+    "pred_h_mm": 101.86204791069031,
+    "err_h_mm": 18.862047910690308,
+    "err_r_mm": 7.9290585627820755,
+    "vol_pred_ml": 174.5527406455949,
+    "steps": 13,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_14.png"
+  },
+  {
+    "idx": 15,
+    "name": "2026-07-27 텀블러 벌어진 컵 (높이 138mm, 바닥r 26mm, 입구r 40mm)",
+    "gt_h_mm": 138.0,
+    "pred_h_mm": 157.67257690429688,
+    "err_h_mm": 19.672576904296857,
+    "err_r_mm": 5.91387045783656,
+    "vol_pred_ml": 404.94761196896434,
+    "steps": 39,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_15.png"
+  },
+  {
+    "idx": 16,
+    "name": "2026-07-27 유리 오므라진 컵 (높이 90mm, 입구r 34mm)",
+    "gt_h_mm": 90.0,
+    "pred_h_mm": 93.70485663414,
+    "err_h_mm": 3.7048566341400107,
+    "err_r_mm": 5.453350020779503,
+    "vol_pred_ml": 361.6496396716684,
+    "steps": 33,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_16.png"
+  },
+  {
+    "idx": 17,
+    "name": "2026-07-27 유리 일자 컵 (높이 152mm, 반지름 29mm)",
+    "gt_h_mm": 152.0,
+    "pred_h_mm": 152.96062231063843,
+    "err_h_mm": 0.960622310638426,
+    "err_r_mm": 4.836933357641103,
+    "vol_pred_ml": 295.3248913399875,
+    "steps": 26,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_17.png"
+  },
+  {
+    "idx": 18,
+    "name": "2026-08-04 일자 컵 (높이 150mm, 반지름 40mm)",
+    "gt_h_mm": 150.0,
+    "pred_h_mm": 154.250248670578,
+    "err_h_mm": 4.250248670578022,
+    "err_r_mm": 2.985232720772426,
+    "vol_pred_ml": 686.0202411189675,
+    "steps": 14,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_18.png"
+  },
+  {
+    "idx": 19,
+    "name": "2026-08-04 일자 컵 (높이 150mm, 반지름 50mm)",
+    "gt_h_mm": 150.0,
+    "pred_h_mm": 157.8804051876068,
+    "err_h_mm": 7.880405187606826,
+    "err_r_mm": 6.202462563912077,
+    "vol_pred_ml": 959.1473499312997,
+    "steps": 20,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_19.png"
+  },
+  {
+    "idx": 20,
+    "name": "2026-08-04 벌어진 컵 1 (높이 90mm, 6개: 초초검검파파)",
+    "gt_h_mm": 90.0,
+    "pred_h_mm": 94.99084413051605,
+    "err_h_mm": 4.9908441305160505,
+    "err_r_mm": 4.080975957949958,
+    "vol_pred_ml": 330.84352617152035,
+    "steps": 5,
+    "img_path": "C:\\Users\\doilm\\OneDrive - 충북과학고등학교\\원드라이브 동기화 폴더\\코딩 작업 폴더\\acoustic_simulation\\V2\\measured_plots\\cup_20.png"
+  }
+]
