@@ -714,6 +714,48 @@ with tab_infer:
         st.subheader("📥 실측 데이터 추정 (단일 / 다중 / 20개 전체 일괄 추정)")
         st.caption("measurement_tool.html 내보내기 JSON 또는 `v2/real_measured_json_all` 저장 폴더의 20개 실측 파일들을 한 번에 일괄 추정합니다.")
 
+        # ── TTR(테스트타임 정제) — 실측 추정 전용. NN 예측을 초깃값으로 물리(TMM) 직접 최적화 ──
+        from v2 import ttr as v2ttr
+        col_t1, col_t2 = st.columns([1.2, 2.8])
+        with col_t1:
+            use_ttr = st.toggle(
+                "🔧 TTR 정제 적용", value=False, key="meas_use_ttr",
+                help="신경망 예측을 초깃값으로 미분가능 TMM(tmm_torch)을 직접 최적화해 "
+                     "형상을 정제합니다. 실측 세션당 수십 초가 추가됩니다.")
+        with col_t2:
+            _ttr_keys = list(v2ttr.VERSIONS.keys())
+            ttr_ver = st.selectbox(
+                "TTR 버전", _ttr_keys,
+                index=_ttr_keys.index(v2ttr.DEFAULT_VERSION),
+                format_func=lambda k: f"{k} — {v2ttr.VERSIONS[k]['desc']}",
+                key="meas_ttr_ver", disabled=not use_ttr)
+        ttr_opts = {}
+        if use_ttr:
+            with st.expander(f"TTR {ttr_ver} 옵션 (버전 간 성능 비교 시에는 기본값 권장)"):
+                for _ok, _ov in v2ttr.default_opts(ttr_ver).items():
+                    _key = f"ttr_opt_{ttr_ver}_{_ok}"
+                    if isinstance(_ov, int):
+                        ttr_opts[_ok] = int(st.number_input(_ok, value=int(_ov), step=1, key=_key))
+                    else:
+                        ttr_opts[_ok] = float(st.number_input(_ok, value=float(_ov),
+                                                              format="%.4f", key=_key))
+
+        def _run_ttr(spec_seq, v_seq, pred_h_m, pred_r_m, progress_slot=None):
+            """NN 예측(m)을 초깃값으로 TTR 실행 → (H_m, r_m(25,), delta_mm)."""
+            refine = v2ttr.get_refiner(ttr_ver)
+            cb = None
+            if progress_slot is not None:
+                _pb = progress_slot.progress(0.0, text=f"TTR {ttr_ver} 최적화 중...")
+                def cb(it, total):
+                    _pb.progress(it / total, text=f"TTR {ttr_ver} 최적화 중... {it}/{total}")
+            H_mm, r_mm, d_mm, _hist = refine(
+                np.asarray(spec_seq, np.float32), np.asarray(v_seq, np.float64),
+                float(pred_h_m) * 1000.0, np.asarray(pred_r_m, np.float64) * 1000.0,
+                verbose=False, progress_cb=cb, **ttr_opts)
+            if progress_slot is not None:
+                progress_slot.empty()
+            return H_mm / 1000.0, np.asarray(r_mm) / 1000.0, d_mm
+
         real_all_dir = _find_best_dir(["v2/real_measured_json_all", "real_measured_json_all", "../v2/real_measured_json_all"], ".json")
         saved_jsons = sorted(_glob_init.glob(os.path.join(real_all_dir, "*.json")))
 
@@ -724,8 +766,23 @@ with tab_infer:
             if saved_jsons:
                 st.caption(f"💡 `real_measured_json_all` 폴더에 총 {len(saved_jsons)}개의 원본 형상이 포함된 실측 JSON이 준비되어 있습니다.")
 
+        # 업로더는 파일을 계속 담아두므로(누적), '실행' 버튼을 눌렀을 때
+        # 현재 담긴 파일만 처리하고, '비우기'로 목록을 초기화할 수 있게 함.
+        _up_key_n = int(st.session_state.get("meas_upload_key_n", 0))
         ups = st.file_uploader("실측 스펙트럼 JSON 파일 선택/업로드 (여러 개 동시 선택 가능)", type=["json"],
-                               accept_multiple_files=True, key="meas_json_multi")
+                               accept_multiple_files=True, key=f"meas_json_multi_{_up_key_n}")
+
+        c_up1, c_up2, c_up3 = st.columns([1.2, 0.8, 2.0])
+        with c_up1:
+            run_uploaded = st.button(f"📤 업로드한 {len(ups) if ups else 0}개 파일 추정 실행",
+                                     disabled=not ups, use_container_width=True)
+        with c_up2:
+            if st.button("🧹 업로더 비우기", use_container_width=True):
+                st.session_state["meas_upload_key_n"] = _up_key_n + 1
+                st.rerun()
+        with c_up3:
+            if ups:
+                st.caption("담긴 파일: " + ", ".join(f.name for f in ups))
 
         items_to_process = []
         import json as _json
@@ -736,7 +793,7 @@ with tab_infer:
                         items_to_process.append((os.path.basename(s_fp), _json.load(f)))
                 except Exception as ex:
                     st.error(f"{s_fp} 로드 실패: {ex}")
-        elif ups:
+        elif run_uploaded and ups:
             for up_f in ups:
                 try:
                     items_to_process.append((up_f.name, _json.load(up_f)))
@@ -772,16 +829,30 @@ with tab_infer:
                     st.error(f"[{item_name}] 추론 실패: {ex}")
                     continue
 
+                ttr_h, ttr_r, ttr_d = None, None, None
+                if use_ttr:
+                    _ps = st.empty()
+                    try:
+                        _ps.caption(f"[{item_name}] TTR {ttr_ver} 시작...")
+                        ttr_h, ttr_r, ttr_d = _run_ttr(spec_m, v_m, pred_h, pred_r, progress_slot=_ps)
+                    except Exception as ex:
+                        _ps.empty()
+                        st.warning(f"[{item_name}] TTR 실패: {ex} — NN 결과만 기록")
+
                 labels_gt = np.asarray(meas["true_r_m"], dtype=np.float32) if "true_r_m" in meas else None
                 mask_gt = np.asarray(meas["true_mask"], dtype=np.float32) if "true_mask" in meas else None
                 H_gt = float(meas["true_H_m"]) if "true_H_m" in meas else None
 
                 err_h_mm, err_r_mm = None, None
+                ttr_err_h_mm, ttr_err_r_mm = None, None
                 if labels_gt is not None and H_gt is not None:
                     if mask_gt is None:
                         mask_gt = (labels_gt > 0).astype(np.float32)
                     err_h_mm = abs(pred_h - H_gt) * 1000.0
                     err_r_mm = float(np.abs((pred_r - labels_gt) * mask_gt).sum() / max(mask_gt.sum(), 1.0)) * 1000.0
+                    if ttr_h is not None:
+                        ttr_err_h_mm = abs(ttr_h - H_gt) * 1000.0
+                        ttr_err_r_mm = float(np.abs((ttr_r - labels_gt) * mask_gt).sum() / max(mask_gt.sum(), 1.0)) * 1000.0
 
                 n_valid_m = min(max(int(np.ceil(pred_h * 1000 / 10)), 1), config.N_SLOTS)
                 vol_pred = float(np.sum(np.pi * pred_r[:n_valid_m] ** 2 * config.SLOT_PITCH)) * 1e6
@@ -794,7 +865,7 @@ with tab_infer:
                 tot_inj_ml = round(float(v_cum_ml[-1]), 1) if n_steps > 0 else 0.0
 
                 disp_name = meas.get("description", item_name)
-                summary_rows.append({
+                row = {
                     "실측 대상 컵": disp_name,
                     "1회 주입 (mL)": f"{step_vol_ml} mL" if step_vol_ml else "-",
                     "총 주입 (mL)": f"{tot_inj_ml:.1f} mL",
@@ -804,7 +875,15 @@ with tab_infer:
                     "H 오차 (mm)": f"{err_h_mm:.1f}" if err_h_mm is not None else "-",
                     "r 오차 (mm)": f"{err_r_mm:.1f}" if err_r_mm is not None else "-",
                     "예측 부피 (mL)": f"{vol_pred:.0f}"
-                })
+                }
+                if use_ttr:
+                    row.update({
+                        f"TTR H (mm)": f"{ttr_h*1000:.1f}" if ttr_h is not None else "-",
+                        f"TTR H 오차 (mm)": f"{ttr_err_h_mm:.1f}" if ttr_err_h_mm is not None else "-",
+                        f"TTR r 오차 (mm)": f"{ttr_err_r_mm:.2f}" if ttr_err_r_mm is not None else "-",
+                        f"δ (mm)": f"{ttr_d:.1f}" if ttr_d is not None else "-",
+                    })
+                summary_rows.append(row)
 
                 tz_mm = meas.get("true_profile_z_mm")
                 tr_mm = meas.get("true_profile_r_mm")
@@ -817,6 +896,8 @@ with tab_infer:
                     "pred_h": pred_h,
                     "err_h_mm": err_h_mm,
                     "err_r_mm": err_r_mm,
+                    "ttr_h": ttr_h, "ttr_r": ttr_r, "ttr_d": ttr_d,
+                    "ttr_err_h_mm": ttr_err_h_mm, "ttr_err_r_mm": ttr_err_r_mm,
                     "spec_m": spec_m,
                     "v_m": v_m,
                     "tz_mm": tz_mm,
@@ -837,6 +918,19 @@ with tab_infer:
                 m_c2.metric("전체 평균 r 반지름 오차", f"{np.mean(valid_r_errs):.2f} mm")
                 m_c3.metric("평가 완료 세션", f"{len(valid_h_errs)} / {len(summary_rows)} 개")
 
+            if use_ttr:
+                t_h_errs = [float(r["TTR H 오차 (mm)"]) for r in summary_rows if r.get("TTR H 오차 (mm)", "-") != "-"]
+                t_r_errs = [float(r["TTR r 오차 (mm)"]) for r in summary_rows if r.get("TTR r 오차 (mm)", "-") != "-"]
+                if t_h_errs and t_r_errs:
+                    t_c1, t_c2, t_c3 = st.columns(3)
+                    t_c1.metric(f"TTR {ttr_ver} 평균 H 오차", f"{np.mean(t_h_errs):.2f} mm",
+                                delta=f"{np.mean(t_h_errs) - np.mean(valid_h_errs):+.2f} mm",
+                                delta_color="inverse")
+                    t_c2.metric(f"TTR {ttr_ver} 평균 r 오차", f"{np.mean(t_r_errs):.2f} mm",
+                                delta=f"{np.mean(t_r_errs) - np.mean(valid_r_errs):+.2f} mm",
+                                delta_color="inverse")
+                    t_c3.metric("TTR 완료 세션", f"{len(t_h_errs)} / {len(summary_rows)} 개")
+
             # 2. 요약 표
             st.dataframe(pd.DataFrame(summary_rows), use_container_width=True)
 
@@ -852,16 +946,31 @@ with tab_infer:
                     c_m3.metric("측정 스텝 수", f"{item['n_steps']} 스텝")
                     c_m4.metric("예측 컵 부피", f"{item['vol_pred']:.0f} mL")
 
-                    c_spec, c_prof = st.columns(2)
+                    has_ttr = item.get("ttr_h") is not None
+                    if has_ttr:
+                        c_spec, c_prof, c_ttr = st.columns(3)
+                    else:
+                        c_spec, c_prof = st.columns(2)
                     with c_spec:
                         st.pyplot(plot_spec_waterfall(item["spec_m"], item["v_m"], title="음향 공명 스펙트로그램"))
                     with c_prof:
-                        t_str = f"#{idx_p:02d} 형상 프로파일 비교\nH err {eh:.1f}mm / r err {er:.1f}mm"
+                        t_str = f"#{idx_p:02d} NN 프로파일\nH err {eh:.1f}mm / r err {er:.1f}mm"
                         st.pyplot(plot_slot_profile(
                             item["labels_gt"], item["mask_gt"], item["H_gt"],
                             item["pred_r"], item["pred_h"],
                             title=t_str, true_z_mm=item["tz_mm"], true_r_mm=item["tr_mm"]
                         ))
+                    if has_ttr:
+                        with c_ttr:
+                            teh, ter = item["ttr_err_h_mm"], item["ttr_err_r_mm"]
+                            tt_str = (f"#{idx_p:02d} TTR 프로파일\n"
+                                      + (f"H err {teh:.1f}mm / r err {ter:.1f}mm" if teh is not None else "참값 없음"))
+                            st.pyplot(plot_slot_profile(
+                                item["labels_gt"], item["mask_gt"], item["H_gt"],
+                                item["ttr_r"], item["ttr_h"],
+                                title=tt_str, true_z_mm=item["tz_mm"], true_r_mm=item["tr_mm"]
+                            ))
+                            st.caption(f"🔧 δ={item['ttr_d']:.1f}mm")
 
 
 

@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-"""TTR v0 배치 실행 — 리그 10컵(참값 내장 JSON) 채점.
+"""TTR 배치 실행 — 리그 10컵(참값 내장 JSON) 채점. 버전별 성능 비교표 생성용.
 
 실행 (프로젝트 루트 acoustic_simulation\ 에서):
-    python v2\ttr\run_ttr_rig10.py
+    python v2\ttr\run_ttr_rig10.py            # 기본 버전(레지스트리 DEFAULT_VERSION)
+    python v2\ttr\run_ttr_rig10.py --ver v0   # 버전 지정
 
 전제:
   - 체크포인트: dataset\models_v2\rnn_sline_nodetach_bestH.pt / rnn_sline_uni.pt
   - 실측 JSON:  v2\real_measured_json_all\*.json (true_H_mm/true_r_mm 포함)
-출력: v2\ttr\ttr_rig10_results.csv
+출력: v2\ttr\ttr_rig10_results_{ver}.csv  (버전 간 비교표가 자동으로 쌓임)
 """
-import os, sys, json, time, csv
+import os, sys, json, time, csv, argparse
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,7 +18,7 @@ sys.path.insert(0, ROOT)
 os.chdir(ROOT)
 
 from v2.combine import CombinedPredictor
-from v2.ttr.ttr_v0 import ttr_refine
+from v2 import ttr as ttr_pkg
 
 CKPT_H = os.path.join("dataset", "models_v2", "rnn_sline_nodetach_bestH.pt")
 CKPT_R = os.path.join("dataset", "models_v2", "rnn_sline_uni.pt")
@@ -37,6 +38,16 @@ CUPS = [
 ]
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--ver", default=ttr_pkg.DEFAULT_VERSION,
+                    choices=list(ttr_pkg.VERSIONS.keys()),
+                    help="TTR 버전 (v2/ttr/__init__.py 레지스트리)")
+    args = ap.parse_args()
+    ver = args.ver
+    refine = ttr_pkg.get_refiner(ver)
+    opts = ttr_pkg.default_opts(ver)
+    print(f"== TTR {ver}: {ttr_pkg.VERSIONS[ver]['desc']} | opts={opts} ==")
+
     cp = CombinedPredictor(CKPT_H, CKPT_R, device="cpu")
     rows = []
     for fn, label in CUPS:
@@ -50,7 +61,7 @@ def main():
         tH = d["true_H_mm"]; tr = np.array(d["true_r_mm"]); n = int(sum(d["true_mask"]))
         H0, r0 = cp.predict(spec, v)
         t0 = time.time()
-        H1, r1, delta, _ = ttr_refine(spec, v, H0, r0, iters=120, verbose=False)
+        H1, r1, delta, _ = refine(spec, v, H0, r0, verbose=False, **opts)
         e0, e1 = H0-tH, H1-tH
         m0 = float(np.mean(np.abs(r0[:n]-tr[:n]))); m1 = float(np.mean(np.abs(r1[:n]-tr[:n])))
         rows.append([label, tH, round(H0,1), round(H1,1), round(e0,1), round(e1,1),
@@ -62,7 +73,7 @@ def main():
         eH0 = np.mean([abs(r[4]) for r in rows]); eH1 = np.mean([abs(r[5]) for r in rows])
         m0s = np.mean([r[6] for r in rows]); m1s = np.mean([r[7] for r in rows])
         print(f"\n== 평균: |H오차| NN {eH0:.1f} → TTR {eH1:.1f} mm | r_MAE NN {m0s:.2f} → TTR {m1s:.2f} mm ==")
-        out = os.path.join("v2", "ttr", "ttr_rig10_results.csv")
+        out = os.path.join("v2", "ttr", f"ttr_rig10_results_{ver}.csv")
         with open(out, "w", newline="", encoding="utf-8-sig") as f:
             w = csv.writer(f)
             w.writerow(["컵","참H","NN_H","TTR_H","NN오차","TTR오차","NN_rMAE","TTR_rMAE","delta_mm"])

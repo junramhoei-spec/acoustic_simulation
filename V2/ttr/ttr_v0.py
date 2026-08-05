@@ -67,10 +67,12 @@ def resid(spec):
     med = spec.median(dim=0).values
     return spec - med[None, :]
 
-def ttr_refine(spec_meas, v_cum, H0_mm, r0_mm, iters=150, lr=2e-3,
-               lam_smooth=3.0, delta0_mm=10.0, w_step0=1.0, verbose=True):
+def ttr_refine(spec_meas, v_cum, H0_mm, r0_mm, iters=120, lr=2e-3,
+               lam_smooth=3.0, delta0_mm=10.0, w_step0=1.0, verbose=True,
+               progress_cb=None):
     """spec_meas: (S,700) log10|H| 실측(생성 그리드 700bins), v_cum: (S,) [m³].
-    반환: H_mm, r_mm(25), delta_mm, loss 이력."""
+    반환: H_mm, r_mm(25), delta_mm, loss 이력.
+    progress_cb(it, iters): UI 진행 표시용 콜백 (알고리즘·결과에 영향 없음)."""
     S = len(spec_meas)
     meas = torch.tensor(np.asarray(spec_meas, np.float64)[:, BAND], dtype=DTYPE)
     meas_r = resid(meas)
@@ -100,7 +102,9 @@ def ttr_refine(spec_meas, v_cum, H0_mm, r0_mm, iters=150, lr=2e-3,
         hist.append(float(loss_fit.detach()))
         if verbose and (it % 25 == 0 or it == iters-1):
             print(f"  it{it:3d} fit={hist[-1]:.5f} H={float(H)*1000:6.1f} δ={float(delta)*1000:5.1f}", flush=True)
-    H = float(config.H_MIN + torch.sigmoid(H_n)*(config.H_MAX-config.H_MIN)) * 1000
+        if progress_cb is not None:
+            progress_cb(it + 1, iters)
+    H = float((config.H_MIN + torch.sigmoid(H_n)*(config.H_MAX-config.H_MIN)).detach()) * 1000
     r = (config.R_MIN + torch.sigmoid(r_n).detach().numpy()*(config.R_MAX-config.R_MIN)) * 1000
-    d = float(torch.sigmoid(d_n)) * 30.0
+    d = float(torch.sigmoid(d_n).detach()) * 30.0
     return H, r, d, hist
